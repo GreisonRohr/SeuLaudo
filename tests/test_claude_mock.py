@@ -27,6 +27,7 @@ LEITURA = {
 
 INTERPRETACAO = {
     "resumo": "Dois resultados ficaram acima da referência.",
+    "destaques": ["Glicose acima da referência: 126 mg/dL."],
     "itens": [
         {"indice": 0, "titulo": "Glicose", "o_que_e": "Açúcar no sangue.", "seu_resultado": "Acima.",
          "possiveis_causas": ["Jejum inadequado"]},
@@ -84,6 +85,7 @@ def test_leitura_e_interpretacao_com_claude(monkeypatch):
         assert r.status_code == 200, r.text
         interp = r.json()["interpretacao"]
         assert interp["modo"] == "claude"
+        assert interp["destaques"] == ["Glicose acima da referência: 126 mg/dL."]
         assert [i["indice"] for i in interp["itens"]] == [0]  # índice inválido descartado
         assert interp["exames_para_conversar"][0]["exame"] == "Hemoglobina glicada"
 

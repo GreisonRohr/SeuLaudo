@@ -179,6 +179,18 @@ details.det>summary::after{content:"+";font-size:22px;color:var(--sub)}details.d
 .regua .ref{position:absolute;top:12px;height:10px;background:var(--faixa)}
 .regua .marc{position:absolute;top:5px;width:24px;height:24px;margin-left:-12px;border-radius:50%;border:4px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,.25)}
 .regua .lim{position:absolute;top:26px;font-size:12px;color:var(--sub);transform:translateX(-50%);white-space:nowrap}
+.destaques{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px;font-size:16px}
+.destaques li{display:flex;gap:10px;align-items:flex-start}
+.destaques li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--marca);margin-top:9px}
+.tab-resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:14px 22px}
+.grupo h4{margin:0 0 4px;font-size:13px;font-weight:700;color:var(--sub);text-transform:none;letter-spacing:0}
+.linha-res{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--linha);background:none;padding:10px 4px;min-height:52px}
+.linha-res:hover{background:var(--marca-suave)}
+.linha-res .n{flex:1}.linha-res .n small{display:block;color:var(--sub);font-size:12px}
+.linha-res .v{white-space:nowrap;font-weight:700}.linha-res .v small{font-weight:500;color:var(--sub)}
+.linha-res.fora .v{color:var(--fora)}.linha-res.critico .v{color:var(--crit)}
+.linha-res .selo{min-width:84px;justify-content:center}
+.exame.pisca{box-shadow:0 0 0 4px color-mix(in srgb,var(--marca) 35%,transparent);transition:box-shadow .3s}
 .proximos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:12px;margin-top:12px}
 .bloco{background:var(--bg);border-radius:18px;padding:18px}
 .bloco h3{display:flex;gap:10px;align-items:center}.bloco h3 svg{color:var(--marca)}
@@ -408,7 +420,7 @@ const ANALITOS_RAW = [["GLI", "Glicose", "glicemia|glicemia de jejum|glicose de 
 const CRITICOS_RAW = [["K", "mmol l", "2.8", "6.2", "Potássio em nível que pode afetar o ritmo do coração."], ["NA", "mmol l", "120", "160", "Sódio em nível que pode causar confusão mental e convulsões."], ["GLI", "mg dl", "50", "400", "Glicose em nível que pode causar perda de consciência ou descompensação do diabetes."], ["HB", "g dl", "7", "20", "Hemoglobina em nível muito alterado."], ["PLT", "ul", "20000", "1000000", "Plaquetas em nível com risco de sangramento ou trombose."], ["PLT", "mil ul", "20", "1000", "Plaquetas em nível com risco de sangramento ou trombose."], ["LEU", "ul", "2000", "30000", "Leucócitos em nível que exige avaliação médica rápida."], ["LEU", "mil ul", "2", "30", "Leucócitos em nível que exige avaliação médica rápida."], ["CA", "mg dl", "6.5", "13", "Cálcio em nível que pode afetar músculos, nervos e coração."], ["MG", "mg dl", "1", "", "Magnésio muito baixo pode afetar o ritmo do coração."], ["CREA", "mg dl", "", "7", "Creatinina muito alta indica possível perda importante da função dos rins."], ["INR", "", "", "5", "RNI muito alto indica risco aumentado de sangramento."], ["BT", "mg dl", "", "15", "Bilirrubina muito alta exige avaliação médica rápida."]];
 const EXEMPLO = "Laboratório: Laboratório Exemplo de Análises Clínicas\nPaciente: Maria Aparecida Souza\nData de nascimento: 14/03/1972 | Idade: 54 anos | Sexo: F\nMédico solicitante: Dr. João Pereira\nData da coleta: 10/11/2026\n\nHEMOGRAMA COMPLETO\nHemoglobina ............: 11,2 g/dL        VR: 12,0 a 16,0 g/dL\nHematócrito ............: 34,8 %           VR: 36,0 a 46,0 %\nVCM ....................: 76,5 fL          VR: 80,0 a 100,0 fL\nLeucócitos .............: 6.800 /mm³       VR: 4.000 a 11.000 /mm³\nPlaquetas ..............: 245.000 /mm³     VR: 150.000 a 450.000 /mm³\n\nBIOQUÍMICA\nGlicose ................: 112 mg/dL        VR: 70 a 99 mg/dL\nHemoglobina glicada ....: 6,1 %            VR: Inferior a 5,7 %\nColesterol total .......: 228 mg/dL        VR: Inferior a 190 mg/dL\nColesterol HDL .........: 52 mg/dL         VR: Superior a 40 mg/dL\nColesterol LDL .........: 148 mg/dL        VR: Inferior a 130 mg/dL\nTriglicerídeos .........: 140 mg/dL        VR: Inferior a 150 mg/dL\nCreatinina .............: 0,82 mg/dL       VR: 0,50 a 1,10 mg/dL\nPotássio ...............: 4,3 mEq/L        VR: 3,5 a 5,1 mEq/L\nTSH ....................: 3,10 µUI/mL      VR: 0,45 a 4,50 µUI/mL\nFerritina ..............: 9 ng/mL          VR: 15 a 150 ng/mL\n\nLiberado eletronicamente em 11/11/2026.\n";
 const PROMPT_LEITURA = "Você transcreve laudos de exames (resultados) emitidos por laboratórios e clínicas no\nBrasil para um formulário estruturado. O paciente vai conferir a transcrição antes de qualquer\ninterpretação, então a fidelidade ao documento é o que importa.\n\nRegras:\n- Transcreva apenas o que está no documento. Nunca invente nem corrija valores. Campo ausente = \"\".\n- Datas no formato DD/MM/AAAA. Sexo: \"M\", \"F\" ou \"\".\n- \"tipo\": \"laboratorial\" para exames com valores (sangue, urina, fezes, hormônios...); \"imagem\" para\n  ultrassom, raio-X, tomografia, ressonância, mamografia, densitometria, ecocardiograma etc.;\n  \"outro\" para os demais laudos descritivos (anatomopatológico, eletrocardiograma...).\n- \"resultados\": um item por valor medido. Em painéis (hemograma, lipidograma, urina tipo I), cada\n  parâmetro é um item, com \"exame\" = nome do painel e \"analito\" = nome do parâmetro. No leucograma,\n  use os valores absolutos (/mm³ ou /µL) e coloque o percentual em \"observacao\".\n- \"valor\": exatamente como impresso, mantendo vírgula decimal e sinais (ex.: \"13,5\", \"< 0,5\",\n  \"Negativo\", \"250.000\"). \"unidade\" como impressa.\n- \"referencia\": o texto completo dos valores de referência daquele item, como impresso.\n- \"ref_min\" / \"ref_max\": os limites numéricos da faixa que se aplica A ESTE paciente (considere\n  sexo, idade e fase quando o laudo trouxer várias faixas). Use null para o limite que não existir\n  (ex.: \"< 200\" -> ref_min null, ref_max 200) e null em ambos quando não houver faixa numérica ou\n  quando não der para saber qual faixa se aplica. Para lipídios com metas por risco, use a faixa\n  \"desejável\"/\"ótimo\" para adultos sem outra indicação.\n- Laudos descritivos: preencha \"titulo_exame\", \"achados\" (texto do laudo, resumido sem perder\n  informação) e \"conclusao\" (impressão diagnóstica/conclusão, como escrita). Deixe \"resultados\" vazio,\n  salvo medidas numéricas com referência (ex.: densitometria T-score).\n- \"campos_incertos\": caminhos dos campos lidos com dúvida (ex.: \"resultados[3].valor\").\n- \"alertas_leitura\": problemas que o paciente deve conferir: página cortada, foto ilegível em algum\n  trecho, mais de um paciente, documento que não é laudo (ex.: pedido médico, receita) etc.\n";
-const PROMPT_INTERP = "Você ajuda pacientes brasileiros a entender o laudo dos próprios exames. O texto será lido\npelo paciente, não por um profissional de saúde. Seu papel é educativo: explicar, contextualizar e\npreparar o paciente para conversar com o médico. Você não diagnostica, não prescreve e não substitui\na consulta.\n\nEscreva em português do Brasil, em linguagem simples (como para alguém sem formação em saúde),\nfrases curtas, tom calmo e respeitoso. Evite jargão; quando um termo técnico for necessário,\nexplique-o. Não use alarmismo nem falsa tranquilidade.\n\nVocê recebe o laudo já transcrito e conferido pelo paciente, em JSON. Para cada resultado, o campo\n\"situacao\" foi calculado pelo sistema comparando o valor com a referência do próprio laudo:\n\"normal\", \"alto\", \"baixo\", \"alterado\" (qualitativo fora do esperado) ou \"sem_referencia\".\nRespeite essa classificação: não a contradiga. Quando houver \"historico\", são valores anteriores do\nmesmo exame deste paciente (de outros laudos); comente a evolução quando for relevante.\n\nRegras de conteúdo:\n- Nunca afirme que o paciente tem uma doença. Use \"pode estar relacionado a\", \"costuma ser\n  investigado\", \"o médico pode avaliar se...\".\n- Considere os resultados em conjunto (ex.: hemoglobina baixa + VCM baixo + ferritina baixa sugerem\n  investigar falta de ferro; glicose e hemoglobina glicada juntas).\n- Nunca indique medicamentos, doses, suplementos específicos ou mudanças de tratamento.\n- \"exames_para_conversar\": exames complementares que um médico costuma considerar diante destes\n  resultados, com o motivo em uma frase. Apresente como algo para conversar com o médico, nunca\n  como ordem. Lista vazia se nada fizer sentido. No máximo 5.\n- \"perguntas_medico\": 3 a 6 perguntas objetivas que o paciente pode levar à consulta.\n- \"habitos\": orientações gerais e seguras de estilo de vida ligadas aos achados (alimentação,\n  atividade física, sono, álcool, hidratação). Lista vazia se não houver nada pertinente.\n- \"procurar_atendimento\": sinais ou situações deste laudo que pedem procurar atendimento médico\n  rapidamente ou pronto-socorro (ex.: resultados com \"critico\": true, troponina positiva, achado de\n  imagem descrito como urgente). Diga o que fazer de forma clara. Lista vazia se não houver.\n- \"acompanhamento\": em 1 a 3 frases, como esses exames costumam ser acompanhados (ex.: repetir após\n  tratamento, a critério do médico). Não defina prazos rígidos.\n- \"itens\": um item para cada resultado alterado (\"alto\", \"baixo\", \"alterado\") e para os normais que\n  ajudem a entender o conjunto; \"indice\" é a posição do resultado na lista \"resultados\" (começando\n  em 0). Em laudos descritivos (imagem e outros), faça itens com indice -1 explicando os achados e\n  a conclusão, termo a termo. \"o_que_e\": o que o exame mede (1 a 2 frases). \"seu_resultado\": o que\n  o valor significa em relação à referência (1 a 3 frases). \"possiveis_causas\": causas comuns,\n  incluindo as que não são doença (jejum, exercício, hidratação, medicamentos, ciclo menstrual);\n  vazia para resultados normais.\n- \"resumo\": 3 a 6 frases com a visão geral do laudo: o que está dentro do esperado, o que chama\n  atenção e o próximo passo (conversar com o médico).\n- Se o laudo não parecer um laudo de exame, diga isso no resumo e deixe as listas vazias.\n";
+const PROMPT_INTERP = "Você ajuda pacientes brasileiros a entender o laudo dos próprios exames. O texto será lido\npelo paciente, não por um profissional de saúde. Seu papel é educativo: explicar, contextualizar e\npreparar o paciente para conversar com o médico. Você não diagnostica, não prescreve e não substitui\na consulta.\n\nEscreva em português do Brasil, em linguagem simples (como para alguém sem formação em saúde),\nfrases curtas, tom calmo e respeitoso. Evite jargão; quando um termo técnico for necessário,\nexplique-o. Não use alarmismo nem falsa tranquilidade.\n\nVocê recebe o laudo já transcrito e conferido pelo paciente, em JSON. Para cada resultado, o campo\n\"situacao\" foi calculado pelo sistema comparando o valor com a referência do próprio laudo:\n\"normal\", \"alto\", \"baixo\", \"alterado\" (qualitativo fora do esperado) ou \"sem_referencia\".\nRespeite essa classificação: não a contradiga. Quando houver \"historico\", são valores anteriores do\nmesmo exame deste paciente (de outros laudos); comente a evolução quando for relevante.\n\nRegras de conteúdo:\n- Nunca afirme que o paciente tem uma doença. Use \"pode estar relacionado a\", \"costuma ser\n  investigado\", \"o médico pode avaliar se...\".\n- Considere os resultados em conjunto (ex.: hemoglobina baixa + VCM baixo + ferritina baixa sugerem\n  investigar falta de ferro; glicose e hemoglobina glicada juntas).\n- Nunca indique medicamentos, doses, suplementos específicos ou mudanças de tratamento.\n- \"exames_para_conversar\": exames complementares que um médico costuma considerar diante destes\n  resultados, com o motivo em uma frase. Apresente como algo para conversar com o médico, nunca\n  como ordem. Lista vazia se nada fizer sentido. No máximo 5.\n- \"perguntas_medico\": 3 a 6 perguntas objetivas que o paciente pode levar à consulta.\n- \"habitos\": orientações gerais e seguras de estilo de vida ligadas aos achados (alimentação,\n  atividade física, sono, álcool, hidratação). Lista vazia se não houver nada pertinente.\n- \"procurar_atendimento\": sinais ou situações deste laudo que pedem procurar atendimento médico\n  rapidamente ou pronto-socorro (ex.: resultados com \"critico\": true, troponina positiva, achado de\n  imagem descrito como urgente). Diga o que fazer de forma clara. Lista vazia se não houver.\n- \"acompanhamento\": em 1 a 3 frases, como esses exames costumam ser acompanhados (ex.: repetir após\n  tratamento, a critério do médico). Não defina prazos rígidos.\n- \"itens\": um item para cada resultado alterado (\"alto\", \"baixo\", \"alterado\") e para os normais que\n  ajudem a entender o conjunto; \"indice\" é a posição do resultado na lista \"resultados\" (começando\n  em 0). Em laudos descritivos (imagem e outros), faça itens com indice -1 explicando os achados e\n  a conclusão, termo a termo. \"o_que_e\": o que o exame mede (1 a 2 frases). \"seu_resultado\": o que\n  o valor significa em relação à referência (1 a 3 frases). \"possiveis_causas\": causas comuns,\n  incluindo as que não são doença (jejum, exercício, hidratação, medicamentos, ciclo menstrual);\n  vazia para resultados normais.\n- \"resumo\": 3 a 6 frases com a visão geral do laudo: o que está dentro do esperado, o que chama\n  atenção e o próximo passo (conversar com o médico).\n- \"destaques\": 3 a 5 frases curtas (até 15 palavras cada) com os pontos principais do laudo, do\n  mais importante para o menos importante: o que está fora da referência, o que melhorou ou piorou\n  em relação ao histórico e o que está bem. Cite o exame e o valor. Sem diagnóstico.\n- Se o laudo não parecer um laudo de exame, diga isso no resumo e deixe as listas vazias.\n";
 
 const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -556,7 +568,7 @@ const ERROS = {
 };
 const msgErro = e => e?.code ? (ERROS[e.code] || "Falha ao falar com o Claude. Tente de novo.") : (e?.message || String(e));
 const FORMATO_LEITURA = `{"tipo":"laboratorial","paciente":{"nome":"","data_nascimento":"","idade":"","sexo":""},"laboratorio":"","data_coleta":"","medico_solicitante":"","resultados":[{"exame":"","analito":"","valor":"","unidade":"","referencia":"","ref_min":null,"ref_max":null,"material":"","metodo":"","observacao":""}],"titulo_exame":"","achados":"","conclusao":"","legibilidade":"boa","campos_incertos":[],"alertas_leitura":[]}`;
-const FORMATO_INTERP = `{"resumo":"","itens":[{"indice":0,"titulo":"","o_que_e":"","seu_resultado":"","possiveis_causas":[]}],"perguntas_medico":[],"exames_para_conversar":[{"exame":"","motivo":""}],"habitos":[],"procurar_atendimento":[],"acompanhamento":""}`;
+const FORMATO_INTERP = `{"resumo":"","destaques":[],"itens":[{"indice":0,"titulo":"","o_que_e":"","seu_resultado":"","possiveis_causas":[]}],"perguntas_medico":[],"exames_para_conversar":[{"exame":"","motivo":""}],"habitos":[],"procurar_atendimento":[],"acompanhamento":""}`;
 function completarLeitura(x) {
   const d = vazio(), S = v => String(v ?? ""), N = v => (typeof v === "number" && isFinite(v) ? v : null);
   d.tipo = ["laboratorial", "imagem", "outro"].includes(x?.tipo) ? x.tipo : "laboratorial";
@@ -838,7 +850,7 @@ function interpBasica(d, hist) {
     modo: "basico",
     resumo: fora.length ? `De ${n} resultados, ${fora.length} ficaram fora da faixa de referência do laboratório: ${fora.join(", ")}. Isso não significa necessariamente uma doença, mas vale conversar com seu médico sobre eles.`
       : n ? `Os ${n} resultados deste laudo estão dentro das faixas de referência do laboratório.` : "Não há resultados numéricos neste laudo para comparar automaticamente.",
-    itens, perguntas_medico: fora.length ? ["Algum destes resultados precisa de tratamento ou de novos exames?", "Quando devo repetir os exames que vieram fora da referência?", "Algum medicamento que uso pode ter interferido nos resultados?", "Há algo que eu possa mudar na alimentação ou nos hábitos para melhorar estes valores?"] : ["Algum medicamento que uso pode ter interferido nos resultados?"],
+    destaques: destaquesBasicos(d, hist), itens, perguntas_medico: fora.length ? ["Algum destes resultados precisa de tratamento ou de novos exames?", "Quando devo repetir os exames que vieram fora da referência?", "Algum medicamento que uso pode ter interferido nos resultados?", "Há algo que eu possa mudar na alimentação ou nos hábitos para melhorar estes valores?"] : ["Algum medicamento que uso pode ter interferido nos resultados?"],
     exames_para_conversar: [], habitos: [], procurar_atendimento: [],
     acompanhamento: "A frequência de repetição dos exames depende do seu histórico e deve ser definida pelo seu médico."
   };
@@ -860,7 +872,7 @@ async function interpretar(basico) {
       const x = await sample.json(`${PROMPT_INTERP}\nResponda apenas com um objeto JSON neste formato:\n${FORMATO_INTERP}\n\nLaudo conferido pelo paciente:\n${JSON.stringify(ent, null, 1)}\n\nExplique este laudo para o paciente seguindo as regras.`, { signal: ctl.signal, modelTier: "complex" });
       const L = v => (Array.isArray(v) ? v.map(String).filter(Boolean) : []), S = v => String(v ?? "");
       it = {
-        modo: "claude", resumo: S(x?.resumo), acompanhamento: S(x?.acompanhamento),
+        modo: "claude", resumo: S(x?.resumo), destaques: L(x?.destaques), acompanhamento: S(x?.acompanhamento),
         itens: (Array.isArray(x?.itens) ? x.itens : []).filter(i => Number.isInteger(i?.indice) && i.indice >= -1 && i.indice < d.resultados.length)
           .map(i => ({ indice: i.indice, titulo: S(i.titulo), o_que_e: S(i.o_que_e), seu_resultado: S(i.seu_resultado), possiveis_causas: L(i.possiveis_causas) })),
         perguntas_medico: L(x?.perguntas_medico), habitos: L(x?.habitos), procurar_atendimento: L(x?.procurar_atendimento),
@@ -870,7 +882,7 @@ async function interpretar(basico) {
     const crit = d.resultados.filter(r => r.critico).map(r => `${r.analito || r.nome_padrao}: ${r.valor} ${r.unidade}. ${r.mensagem_critica} Procure atendimento médico o quanto antes e leve este laudo.`);
     it.procurar_atendimento = [...crit, ...it.procurar_atendimento.filter(a => !crit.includes(a))];
     atual.interp = it; atual.status = "interpretado"; salvar();
-    filtroLaudo = d.resultados.some(r => FORA(r.situacao) || r.critico) ? "atencao" : "todos"; recem = true;
+    filtroLaudo = d.resultados.some(r => FORA(r.situacao) || r.critico) ? "atencao" : "todos"; recem = true; abaLaudo = "resumo";
     mostrarLaudo();
   } catch (e) {
     $(".dividido").hidden = false; $("#segConf").hidden = false; $("#confCarregando").hidden = true; segmento("res");
@@ -900,9 +912,9 @@ function regua(r) {
     <div class="marc" style="left:${Math.max(3, Math.min(97, pos(v)))}%;background:${cor}"></div>
     ${mn != null ? `<span class="lim" style="left:${a}%">${fmt(mn)}</span>` : ""}${mx != null ? `<span class="lim" style="left:${b}%">${fmt(mx)}</span>` : ""}</div>`;
 }
-function cartao(item, r) {
+function cartao(item, r, idx) {
   const cls = r?.critico ? "critico" : r && FORA(r.situacao) ? "fora" : "";
-  return `<div class="exame ${cls}">
+  return `<div class="exame ${cls}"${idx != null ? ` id="ex-${idx}"` : ""}>
     <div class="t"><strong>${esc(item.titulo || r?.nome_padrao || r?.analito || "")}</strong>${r ? selo(r, true) : ""}</div>
     ${r ? `<div class="valor">${esc(r.valor)} <small>${esc(r.unidade)}</small></div>${regua(r)}${r.referencia && r.ref_min == null && r.ref_max == null ? `<p class="sub pq">Referência: ${esc(r.referencia)}</p>` : ""}` : ""}
     ${item.seu_resultado ? `<p>${esc(item.seu_resultado)}</p>` : ""}
@@ -911,13 +923,42 @@ function cartao(item, r) {
       ${item.possiveis_causas?.length ? `<p style="margin-top:8px"><strong>Causas comuns</strong> (nem sempre são doença):</p>${lista(item.possiveis_causas)}` : ""}</details>` : ""}
   </div>`;
 }
+const SENTIDO = { alto: "acima da referência", baixo: "abaixo da referência", alterado: "diferente do esperado" };
+function destaquesBasicos(d, hist) { // mesma regra de app/interpretacao.py:destaques_basicos
+  const out = [], res = d.resultados, nome = r => r.nome_padrao || r.analito;
+  res.filter(r => r.critico).forEach(r => out.push(`Valor crítico: ${nome(r)} ${r.valor} ${r.unidade}. Procure atendimento.`.replace(/\s+/g, " ")));
+  const alt = res.filter(r => !r.critico && SENTIDO[r.situacao]), extras = alt.length > 4 ? alt.slice(3) : [];
+  for (const r of extras.length ? alt.slice(0, 3) : alt) {
+    let t = `${nome(r)} ${SENTIDO[r.situacao]}: ${r.valor} ${r.unidade}`.trim();
+    const a = (hist[r.codigo] || []).slice(-1)[0], va = a ? numero(a.valor) : null;
+    if (a && r.valor_numerico != null && va != null && unidade(a.unidade) === unidade(r.unidade) && r.valor_numerico !== va) t += ` (${r.valor_numerico > va ? "subiu" : "caiu"} desde ${a.data}, quando era ${a.valor})`;
+    out.push(t + ".");
+  }
+  if (extras.length) out.push(`Também fora da referência: ${extras.map(nome).join(", ")}.`);
+  const nor = res.filter(r => r.situacao === "normal").length;
+  if (res.length && nor === res.length) out.push(`Todos os ${res.length} resultados estão dentro da referência do laboratório.`);
+  else if (nor) out.push(`${nor} de ${res.length} resultados estão dentro da referência do laboratório.`);
+  if (d.tipo !== "laboratorial" && d.conclusao) out.unshift(`Conclusão do laudo: ${d.conclusao}`);
+  return out;
+}
+const destaquesDe = l => l.interp.destaques?.length ? l.interp.destaques : destaquesBasicos(l.dados, {});
 function textoResumo(l) {
-  const d = l.dados, it = l.interp, linhas = [`Resumo do laudo (${d.laboratorio || "laboratório"}${d.data_coleta ? `, coleta em ${d.data_coleta}` : ""})`, "", it.resumo, "", "Resultados fora da referência:"];
-  d.resultados.filter(r => FORA(r.situacao) || r.critico).forEach(r => linhas.push(`- ${r.analito}: ${r.valor} ${r.unidade} (referência: ${r.referencia || "não informada"})`));
+  const d = l.dados, it = l.interp, linhas = [`Resumo do laudo (${d.laboratorio || "laboratório"}${d.data_coleta ? `, coleta em ${d.data_coleta}` : ""})`, "", it.resumo, "", "Pontos principais:", ...destaquesDe(l).map(x => `- ${x}`), "", "Todos os resultados:"];
+  d.resultados.forEach(r => linhas.push(`- ${r.analito}: ${r.valor} ${r.unidade} (ref.: ${r.referencia || "não informada"}) ${r.critico ? "[CRÍTICO]" : CURTO[r.situacao] || ""}`.trim()));
   if (it.perguntas_medico.length) linhas.push("", "Perguntas para o médico:", ...it.perguntas_medico.map(p => `- ${p}`));
+  linhas.push("", "Explicação educativa, gerada pelo SeuLaudo. Não substitui a avaliação médica.");
   return linhas.join("\n");
 }
 const copiar = (t, m) => navigator.clipboard.writeText(t).then(() => toast(m), () => toast("Não foi possível copiar neste aplicativo."));
+let abaLaudo = "resumo";
+function tabelaResumo(d) {
+  const grupos = new Map();
+  d.resultados.forEach((r, i) => { const c = POR_COD[r.codigo]?.categoria || r.exame || "Outros"; if (!grupos.has(c)) grupos.set(c, []); grupos.get(c).push([r, i]); });
+  return [...grupos].map(([c, rs]) => `<div class="grupo"><h4>${esc(c)}</h4>${rs.map(([r, i]) => `
+    <button class="linha-res ${r.critico ? "critico" : FORA(r.situacao) ? "fora" : ""}" data-ir-exame="${i}">
+      <span class="n">${esc(r.nome_padrao || r.analito)}<small>ref. ${esc(r.referencia || "não informada")}</small></span>
+      <span class="v">${esc(r.valor)} <small>${esc(r.unidade)}</small></span>${selo(r, true)}</button>`).join("")}</div>`).join("");
+}
 function mostrarLaudo() {
   const l = atual, d = l.dados, it = l.interp, porI = new Map(it.itens.map(i => [i.indice, i]));
   const res = d.resultados.map((r, i) => ({ r, i, at: r.critico || FORA(r.situacao) }));
@@ -925,47 +966,61 @@ function mostrarLaudo() {
   const vis = res.filter(x => filtroLaudo === "todos" || (filtroLaudo === "atencao" ? x.at : !x.at));
   const desc = it.itens.filter(i => i.indice === -1).map(i => cartao(i, null));
   const data = d.data_coleta ? `Coleta em ${esc(d.data_coleta)}` : "";
+  const resumo = abaLaudo === "resumo";
+  const icp = n => ic(n, 'style="width:18px;height:18px"');
+  const perguntas = it.perguntas_medico.length ? `<div class="bloco"><h3>${ic("pergunta")}Perguntas para o médico</h3>
+        <ul class="perg">${it.perguntas_medico.map(p => `<li><label><input type="checkbox"><span>${esc(p)}</span></label></li>`).join("")}</ul>
+        <button class="btn peq" data-copiar-perg style="margin-top:10px">${icp("copia")}Copiar perguntas</button></div>` : "";
+  const exames = it.exames_para_conversar.length ? `<div class="bloco"><h3>${ic("doc")}Exames para conversar</h3><p class="sub pq">Sugestões para a consulta, não um pedido de exame.</p>
+        <ul>${it.exames_para_conversar.map(e => `<li><strong>${esc(e.exame)}</strong>: ${esc(e.motivo)}</li>`).join("")}</ul></div>` : "";
   $("#passosLaudo").hidden = !recem;
   $("#relatorio").innerHTML = `
     <div class="cab-laudo">
       <div><h2>${esc(d.titulo_exame || "Seu laudo explicado")}</h2><p class="sub">${[esc(d.laboratorio), data].filter(Boolean).join(" · ")}</p></div>
       <div class="lin">
-        <button class="btn peq" id="bCopiarRes">${ic("copia", 'style="width:18px;height:18px"')}Copiar resumo</button>
-        <button class="btn peq" id="bEditar">${ic("lapis", 'style="width:18px;height:18px"')}Corrigir valores</button>
+        <button class="btn peq" id="bCopiarRes">${icp("copia")}Copiar resumo</button>
+        <button class="btn peq" id="bEditar">${icp("lapis")}Corrigir valores</button>
       </div>
     </div>
     ${res.length ? `<div class="contadores">
-      <button class="cont ok ${filtroLaudo === "normais" ? "ativo" : ""}" data-f="normais"><b>${nOk}</b><span>dentro da referência</span></button>
-      <button class="cont fora ${filtroLaudo === "atencao" ? "ativo" : ""}" data-f="atencao"><b>${nAt - nCrit}</b><span>fora da referência</span></button>
+      <button class="cont ok" data-f="normais"><b>${nOk}</b><span>dentro da referência</span></button>
+      <button class="cont fora" data-f="atencao"><b>${nAt - nCrit}</b><span>fora da referência</span></button>
       <button class="cont crit" data-f="atencao"><b>${nCrit}</b><span>valores críticos</span></button>
     </div>` : ""}
     ${it.procurar_atendimento.length ? `<div class="alerta-crit">${ic("alerta")}<div><strong>Procure atendimento médico</strong>${lista(it.procurar_atendimento)}</div></div>` : ""}
-    <div class="resumo"><div class="ia">${ic(it.modo === "claude" ? "brilho" : "lista", 'style="width:16px;height:16px"')}${it.modo === "claude" ? "Resumo explicado pelo Claude" : "Resumo automático (sem IA)"}</div>${esc(it.resumo)}</div>
-    ${desc.length ? `<h3 style="margin-top:22px">O que o laudo diz</h3><div class="exames">${desc.join("")}</div>` : ""}
-    ${res.length ? `<div class="filtros">
-      <button class="chip ${filtroLaudo === "atencao" ? "ativo" : ""}" data-f="atencao">Merecem atenção (${nAt})</button>
-      <button class="chip ${filtroLaudo === "normais" ? "ativo" : ""}" data-f="normais">Dentro da referência (${nOk})</button>
-      <button class="chip ${filtroLaudo === "todos" ? "ativo" : ""}" data-f="todos">Todos (${res.length})</button>
-    </div>
-    <div class="exames">${vis.map(x => cartao(porI.get(x.i) || { titulo: x.r.nome_padrao || x.r.analito, o_que_e: POR_COD[x.r.codigo]?.descricao || "" }, x.r)).join("") || `<p class="sub">Nenhum resultado neste filtro.</p>`}</div>` : ""}
-    <h3 style="margin-top:28px">Próximos passos</h3>
-    <div class="proximos">
-      ${it.perguntas_medico.length ? `<div class="bloco"><h3>${ic("pergunta")}Perguntas para o médico</h3>
-        <ul class="perg">${it.perguntas_medico.map((p, i) => `<li><label><input type="checkbox"><span>${esc(p)}</span></label></li>`).join("")}</ul>
-        <button class="btn peq" id="bCopiarPerg" style="margin-top:10px">${ic("copia", 'style="width:18px;height:18px"')}Copiar perguntas</button></div>` : ""}
-      ${it.exames_para_conversar.length ? `<div class="bloco"><h3>${ic("doc")}Exames para conversar</h3><p class="sub pq">Sugestões para a consulta, não um pedido de exame.</p>
-        <ul>${it.exames_para_conversar.map(e => `<li><strong>${esc(e.exame)}</strong>: ${esc(e.motivo)}</li>`).join("")}</ul></div>` : ""}
-      ${it.habitos.length ? `<div class="bloco"><h3>${ic("folha")}Hábitos que ajudam</h3>${lista(it.habitos)}</div>` : ""}
-      ${it.acompanhamento ? `<div class="bloco"><h3>${ic("cal")}Acompanhamento</h3><p>${esc(it.acompanhamento)}</p></div>` : ""}
-    </div>
+    <div class="segm" role="tablist"><button data-aba="resumo" class="${resumo ? "ativo" : ""}" role="tab">Resumo</button><button data-aba="exames" class="${resumo ? "" : "ativo"}" role="tab">Exame por exame${res.length ? ` (${res.length})` : ""}</button></div>
+    ${resumo ? `
+      <div class="resumo"><div class="ia">${ic(it.modo === "claude" ? "brilho" : "lista", 'style="width:16px;height:16px"')}${it.modo === "claude" ? "Resumo explicado pelo Claude" : "Resumo automático (sem IA)"}</div>${esc(it.resumo)}
+        <ul class="destaques">${destaquesDe(l).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+      ${desc.length ? `<h3 style="margin-top:22px">O que o laudo diz</h3><div class="exames">${desc.join("")}</div>` : ""}
+      ${res.length ? `<h3 style="margin-top:24px">Todos os resultados</h3><p class="sub pq" style="margin-top:-6px">Toque em um exame para ver a explicação.</p><div class="tab-resumo">${tabelaResumo(d)}</div>` : ""}
+      ${perguntas || exames ? `<h3 style="margin-top:24px">Para levar à consulta</h3><div class="proximos">${perguntas}${exames}</div>` : ""}
+    ` : `
+      ${res.length ? `<div class="filtros">
+        <button class="chip ${filtroLaudo === "atencao" ? "ativo" : ""}" data-f="atencao">Merecem atenção (${nAt})</button>
+        <button class="chip ${filtroLaudo === "normais" ? "ativo" : ""}" data-f="normais">Dentro da referência (${nOk})</button>
+        <button class="chip ${filtroLaudo === "todos" ? "ativo" : ""}" data-f="todos">Todos (${res.length})</button>
+      </div>
+      <div class="exames">${vis.map(x => cartao(porI.get(x.i) || { titulo: x.r.nome_padrao || x.r.analito, o_que_e: POR_COD[x.r.codigo]?.descricao || "" }, x.r, x.i)).join("") || `<p class="sub">Nenhum resultado neste filtro.</p>`}</div>` : `<div class="exames">${desc.join("")}</div>`}
+      <h3 style="margin-top:28px">Próximos passos</h3>
+      <div class="proximos">${perguntas}${exames}
+        ${it.habitos.length ? `<div class="bloco"><h3>${ic("folha")}Hábitos que ajudam</h3>${lista(it.habitos)}</div>` : ""}
+        ${it.acompanhamento ? `<div class="bloco"><h3>${ic("cal")}Acompanhamento</h3><p>${esc(it.acompanhamento)}</p></div>` : ""}
+      </div>`}
     <p class="legal">Esta explicação é educativa e não substitui a avaliação do seu médico. Não use estas informações para iniciar, mudar ou interromper tratamentos. ${it.modo === "claude" ? "O texto foi gerado com IA a partir dos valores que você conferiu; a classificação de cada valor e os alertas de valores críticos são calculados por regras, pela referência do próprio laudo." : ""}</p>
-    <div class="lin" style="margin-top:14px"><button class="btn peq perigo" id="bExcluir">${ic("lixo", 'style="width:18px;height:18px"')}Excluir este laudo</button></div>`;
-  $$("#relatorio [data-f]").forEach(b => b.addEventListener("click", () => { filtroLaudo = b.dataset.f; mostrarLaudo(); }));
+    <div class="lin" style="margin-top:14px"><button class="btn peq perigo" id="bExcluir">${icp("lixo")}Excluir este laudo</button></div>`;
+  const rolar = window.scrollY, mesmo = $("#relatorio").dataset.id == l.id;
+  $$("#relatorio [data-f]").forEach(b => b.addEventListener("click", () => { filtroLaudo = b.dataset.f; abaLaudo = "exames"; mostrarLaudo(); }));
+  $$("#relatorio [data-aba]").forEach(b => b.addEventListener("click", () => { abaLaudo = b.dataset.aba; mostrarLaudo(); }));
+  $$("#relatorio [data-ir-exame]").forEach(b => b.addEventListener("click", () => {
+    const i = +b.dataset.irExame; abaLaudo = "exames"; filtroLaudo = "todos"; mostrarLaudo();
+    const alvo = $(`#ex-${i}`); if (alvo) { alvo.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth", block: "center" }); alvo.classList.add("pisca"); setTimeout(() => alvo.classList.remove("pisca"), 1600); }
+  }));
   $("#bEditar").addEventListener("click", mostrarConferencia);
   $("#bCopiarRes").addEventListener("click", () => copiar(textoResumo(l), "Resumo copiado. Cole numa mensagem ou nota para levar à consulta."));
-  $("#bCopiarPerg")?.addEventListener("click", () => copiar(it.perguntas_medico.map(p => `- ${p}`).join("\n"), "Perguntas copiadas."));
+  $$("[data-copiar-perg]").forEach(b => b.addEventListener("click", () => copiar(it.perguntas_medico.map(p => `- ${p}`).join("\n"), "Perguntas copiadas.")));
   confirmar($("#bExcluir"), "Toque de novo para excluir", () => { LAUDOS = LAUDOS.filter(x => x.id !== l.id); salvar(); toast("Laudo excluído."); mostrar("laudos"); });
-  const rolar = window.scrollY; mostrar("laudo"); if (rolar && $("#relatorio").dataset.id == l.id) window.scrollTo(0, rolar);
+  mostrar("laudo"); if (mesmo && rolar) window.scrollTo(0, rolar);
   $("#relatorio").dataset.id = l.id;
 }
 function confirmar(btn, rotulo, acao) {
@@ -989,7 +1044,7 @@ function desenharLista() {
     return `<button class="laudo-card" data-id="${l.id}"><span class="data-bloco"><span><b>${iso.slice(8, 10)}</b><br><small>${MES[+iso.slice(5, 7) - 1] || ""} ${iso.slice(2, 4)}</small></span></span>
       <span class="meio"><strong>${esc(d.titulo_exame || d.laboratorio || l.arquivo)}</strong><span class="sub pq">${d.tipo !== "laboratorial" ? "Laudo descritivo" : `${n} resultado${n === 1 ? "" : "s"}`} · ${l.status === "interpretado" ? "explicado" : "falta conferir"}</span><br>${s}</span>${ic("seta")}</button>`;
   }).join("");
-  $$(".laudo-card", el).forEach(b => b.addEventListener("click", () => { atual = LAUDOS.find(l => l.id === +b.dataset.id); filtroLaudo = atual.dados.resultados.some(r => FORA(r.situacao) || r.critico) ? "atencao" : "todos"; recem = false; atual.interp ? mostrarLaudo() : mostrarConferencia(); }));
+  $$(".laudo-card", el).forEach(b => b.addEventListener("click", () => { atual = LAUDOS.find(l => l.id === +b.dataset.id); filtroLaudo = atual.dados.resultados.some(r => FORA(r.situacao) || r.critico) ? "atencao" : "todos"; recem = false; abaLaudo = "resumo"; atual.interp ? mostrarLaudo() : mostrarConferencia(); }));
 }
 confirmar($("#bApagar"), "Toque de novo para apagar tudo", () => { LAUDOS = []; store.del("laudos"); store.del("perfil"); previas = {}; toast("Dados apagados."); mostrar("inicio"); });
 

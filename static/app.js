@@ -335,6 +335,7 @@ function mostrarInterpretacao() {
     </div>
     ${it.procurar_atendimento?.length ? `<div class="alerta vermelho"><strong>⚠ Procure atendimento médico</strong>${lista(it.procurar_atendimento)}</div>` : ""}
     <div class="resumo">${esc(it.resumo)}</div>
+    ${it.destaques?.length ? `<h3>Pontos principais</h3>${lista(it.destaques)}` : ""}
     ${descritivos.length ? `<h3>O que o laudo diz</h3><div class="itens">${descritivos.join("")}</div>` : ""}
     ${alterados.length ? `<h3>Resultados que merecem atenção (${alterados.length})</h3><div class="itens">${alterados.join("")}</div>` : ""}
     ${normais.length ? `<details class="normais" ${alterados.length ? "" : "open"}><summary>Resultados dentro da referência ou sem referência (${normais.length})</summary><div class="itens">${normais.join("")}</div></details>` : ""}

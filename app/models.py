@@ -70,6 +70,7 @@ class ExameSugerido(BaseModel):
 
 class Interpretacao(BaseModel):
     resumo: str = ""
+    destaques: list[str] = Field(default_factory=list)  # pontos principais, frases curtas
     itens: list[ItemInterpretado] = Field(default_factory=list)
     perguntas_medico: list[str] = Field(default_factory=list)
     exames_para_conversar: list[ExameSugerido] = Field(default_factory=list)

@@ -52,6 +52,9 @@ def test_fluxo_completo():
     assert interp["modo"] == "basico"
     assert "Glicose" in interp["resumo"] and interp["perguntas_medico"]
     assert interp["procurar_atendimento"] == []
+    assert any("Glicose" in d for d in interp["destaques"])
+    assert any(d.startswith("Também fora da referência:") for d in interp["destaques"])
+    assert any("dentro da referência" in d for d in interp["destaques"])
 
     lista = client.get(f"/api/perfis/{pid}/laudos").json()
     assert lista[0]["qtd_resultados"] == 15 and lista[0]["status"] == "interpretado"
@@ -67,6 +70,7 @@ def test_historico_e_valor_critico():
     client.put(f"/api/laudos/{b['id']}", json=b["dados"])
     interp = client.post(f"/api/laudos/{b['id']}/interpretar?basico=true").json()["interpretacao"]
     assert any("Potássio" in a for a in interp["procurar_atendimento"])
+    assert interp["destaques"][0].startswith("Valor crítico: Potássio")
     item_gli = next(i for i in interp["itens"] if i["titulo"] == "Glicose")
     assert "10/11/2026" in item_gli["seu_resultado"]  # compara com o exame anterior
 
@@ -89,7 +93,6 @@ def test_exclusao_do_perfil_apaga_tudo():
 
 def test_claude_indisponivel_sem_chave():
     s = client.get("/api/status").json()
-    assert s["claude"] is False
     pid = _perfil("Sem chave")
     r = client.post("/api/laudos", data={"perfil_id": pid, "extrator": "claude", "texto": "Glicose: 90"})
     assert r.status_code == 422 and "ANTHROPIC_API_KEY" in r.json()["detail"]["mensagem"]

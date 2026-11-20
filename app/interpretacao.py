@@ -14,6 +14,7 @@ import json
 from . import config, ia
 from .analitos import Catalogo
 from .models import ExameSugerido, Interpretacao, ItemInterpretado, Laudo
+from .valores import numero, unidade
 
 _S = {"type": "string"}
 _LS = {"type": "array", "items": _S}
@@ -26,6 +27,7 @@ def _obj(props: dict) -> dict:
 SCHEMA = _obj(
     {
         "resumo": _S,
+        "destaques": _LS,
         "itens": {
             "type": "array",
             "items": _obj({"indice": {"type": "integer"}, "titulo": _S, "o_que_e": _S,
@@ -80,6 +82,9 @@ Regras de conteúdo:
   vazia para resultados normais.
 - "resumo": 3 a 6 frases com a visão geral do laudo: o que está dentro do esperado, o que chama
   atenção e o próximo passo (conversar com o médico).
+- "destaques": 3 a 5 frases curtas (até 15 palavras cada) com os pontos principais do laudo, do
+  mais importante para o menos importante: o que está fora da referência, o que melhorou ou piorou
+  em relação ao histórico e o que está bem. Cite o exame e o valor. Sem diagnóstico.
 - Se o laudo não parecer um laudo de exame, diga isso no resumo e deixe as listas vazias.
 """
 
@@ -135,6 +140,8 @@ def interpretar(laudo: Laudo, catalogo: Catalogo, historico: dict[str, list[dict
         interp.itens = [i for i in interp.itens if -1 <= i.indice < n]
         for i in interp.itens:
             i.fonte = "claude"
+        if not interp.destaques:
+            interp.destaques = destaques_basicos(laudo, historico)
     else:
         interp = interpretacao_basica(laudo, catalogo, historico)
     # alertas de valores críticos vêm das regras do sistema, sempre
@@ -164,6 +171,7 @@ def interpretacao_basica(laudo: Laudo, catalogo: Catalogo, historico: dict[str, 
         itens.append(ItemInterpretado(indice=-1, titulo=laudo.titulo_exame or "Conclusão do laudo",
                                       seu_resultado=laudo.conclusao))
     total = len(laudo.resultados)
+    destaques = destaques_basicos(laudo, historico)
     if fora:
         resumo = (f"De {total} resultados, {len(fora)} ficaram fora da faixa de referência do laboratório: "
                   f"{', '.join(fora)}. Isso não significa necessariamente uma doença, mas vale conversar "
@@ -174,6 +182,7 @@ def interpretacao_basica(laudo: Laudo, catalogo: Catalogo, historico: dict[str, 
         resumo = "Não há resultados numéricos neste laudo para comparar automaticamente."
     return Interpretacao(
         resumo=resumo + " (Interpretação básica, sem IA: configure a chave da API para uma explicação completa.)",
+        destaques=destaques,
         itens=itens,
         perguntas_medico=PERGUNTAS_BASICAS if fora else PERGUNTAS_BASICAS[2:3],
         exames_para_conversar=[] if not fora else [ExameSugerido(
@@ -182,3 +191,35 @@ def interpretacao_basica(laudo: Laudo, catalogo: Catalogo, historico: dict[str, 
         acompanhamento="A frequência de repetição dos exames depende do seu histórico e deve ser definida pelo seu médico.",
         modo="basico",
     )
+
+
+_SENTIDO = {"alto": "acima da referência", "baixo": "abaixo da referência", "alterado": "diferente do esperado"}
+
+
+def destaques_basicos(laudo: Laudo, historico: dict[str, list[dict]]) -> list[str]:
+    """Pontos principais do laudo, por regra (sem IA): críticos, alterados, mudanças e o que está bem."""
+    out: list[str] = []
+    res = laudo.resultados
+    for r in res:
+        if r.critico:
+            out.append(f"Valor crítico: {r.nome_padrao or r.analito} {r.valor} {r.unidade}. Procure atendimento.".replace("  ", " "))
+    alterados = [r for r in res if not r.critico and r.situacao in _SENTIDO]
+    extras = alterados[3:] if len(alterados) > 4 else []
+    for r in alterados[:3] if extras else alterados:
+        texto = f"{r.nome_padrao or r.analito} {_SENTIDO[r.situacao]}: {r.valor} {r.unidade}".strip()
+        ant = (historico.get(r.codigo) or [None])[-1]
+        v_ant = numero(ant["valor"]) if ant else None
+        if ant and r.valor_numerico is not None and v_ant is not None and unidade(ant["unidade"]) == unidade(r.unidade):
+            if r.valor_numerico != v_ant:
+                texto += f" ({'subiu' if r.valor_numerico > v_ant else 'caiu'} desde {ant['data']}, quando era {ant['valor']})"
+        out.append(texto + ".")
+    if extras:
+        out.append("Também fora da referência: " + ", ".join(r.nome_padrao or r.analito for r in extras) + ".")
+    normais = sum(1 for r in res if r.situacao == "normal")
+    if res and normais == len(res):
+        out.append(f"Todos os {len(res)} resultados estão dentro da referência do laboratório.")
+    elif normais:
+        out.append(f"{normais} de {len(res)} resultados estão dentro da referência do laboratório.")
+    if laudo.tipo != "laboratorial" and laudo.conclusao:
+        out.insert(0, f"Conclusão do laudo: {laudo.conclusao}")
+    return out
