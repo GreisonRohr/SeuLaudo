@@ -14,7 +14,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 os.environ.setdefault("SEULAUDO_DADOS", tempfile.mkdtemp(prefix="seulaudo-build-"))
 from app.extratores.claude import SYSTEM as PROMPT_LEITURA  # noqa: E402
-from app.interpretacao import SYSTEM as PROMPT_INTERP  # noqa: E402
+from app.interpretacao import PROMPT_PERGUNTAS, SYSTEM as PROMPT_INTERP  # noqa: E402
 
 
 def ler(nome, campos):
@@ -30,6 +30,7 @@ for marca, valor in {
     "__EXEMPLO__": (RAIZ / "exemplos/laudo_exemplo.txt").read_text(encoding="utf-8"),
     "__PROMPT_LEITURA__": PROMPT_LEITURA,
     "__PROMPT_INTERP__": PROMPT_INTERP,
+    "__PROMPT_PERGUNTAS__": PROMPT_PERGUNTAS,
 }.items():
     html = html.replace(marca, j(valor).replace("</", "<\\/"))
 (RAIZ / "preview/index.html").write_text(html, encoding="utf-8")
