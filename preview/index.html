@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Laudai — prévia</title>
+<title>SeuLaudoai — prévia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -287,7 +287,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;colo
 </svg>
 
 <header class="topo"><div class="topo-in">
-  <div class="logo"><b><svg class="i"><use href="#i-doc"/></svg></b><span>Laud<em>ai</em></span> <small>prévia</small></div>
+  <div class="logo"><b><svg class="i"><use href="#i-doc"/></svg></b><span>SeuLaudo<em>ai</em></span> <small>prévia</small></div>
   <div class="perfil-wrap" id="perfilWrap" hidden>
     <button class="perfil-btn" id="bPerfil" aria-haspopup="menu" aria-expanded="false"><span class="avatar" id="perfilAv"></span><span id="perfilNome"></span><svg class="i" style="width:16px;height:16px"><use href="#i-baixo"/></svg></button>
     <div class="menu" id="menuPerfil" role="menu" hidden></div>
@@ -1048,7 +1048,7 @@ function textoResumo(l) {
   const d = l.dados, it = l.interp, linhas = [`Resumo do laudo (${d.laboratorio || "laboratório"}${d.data_coleta ? `, coleta em ${d.data_coleta}` : ""})`, "", it.resumo, "", "Pontos principais:", ...destaquesDe(l).map(x => `- ${x}`), "", "Todos os resultados:"];
   d.resultados.forEach(r => linhas.push(`- ${r.analito}: ${r.valor} ${r.unidade} (ref.: ${r.referencia || "não informada"}) ${r.critico ? "[CRÍTICO]" : CURTO[r.situacao] || ""}`.trim()));
   if (it.perguntas_medico.length) linhas.push("", "Perguntas para o médico:", ...it.perguntas_medico.map(p => `- ${p}`));
-  linhas.push("", "Explicação educativa, gerada pelo Laudai. Não substitui a avaliação médica.");
+  linhas.push("", "Explicação educativa, gerada pelo SeuLaudoai. Não substitui a avaliação médica.");
   return linhas.join("\n");
 }
 const copiar = (t, m) => navigator.clipboard.writeText(t).then(() => toast(m), () => toast("Não foi possível copiar neste aplicativo."));
@@ -1337,7 +1337,7 @@ function gerarPDF(l) {
   const titulo = t => { y += 5; novaPag(14); texto(t, { tam: 12.5, negrito: true, cor: MARCA }); y += 1.5; };
   const itens = (xs, cor) => xs.forEach(x => { texto("•  " + x, { rec: 2, cor }); y += 0.8; });
   doc.setFillColor(...MARCA); doc.rect(0, 0, 210, 5, "F");
-  texto("Laudai — resumo do laudo", { tam: 18, negrito: true }); y += 1;
+  texto("SeuLaudoai — resumo do laudo", { tam: 18, negrito: true }); y += 1;
   texto([perfil()?.nome, d.laboratorio, d.data_coleta ? `coleta em ${d.data_coleta}` : ""].filter(Boolean).join("   ·   "), { tam: 10, cor: SUB });
   if (it.procurar_atendimento.length) { titulo("Procure atendimento médico"); itens(it.procurar_atendimento, [196, 40, 28]); }
   titulo("Resumo"); texto(it.resumo); y += 2; itens(destaquesDe(l));
@@ -1366,7 +1366,7 @@ function gerarPDF(l) {
   const n = doc.getNumberOfPages();
   for (let i = 1; i <= n; i++) {
     doc.setPage(i); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...SUB);
-    doc.text(pdfTxt("Conteúdo educativo gerado pelo Laudai. Não substitui a consulta, o diagnóstico ou o tratamento do seu médico."), M, 290);
+    doc.text(pdfTxt("Conteúdo educativo gerado pelo SeuLaudoai. Não substitui a consulta, o diagnóstico ou o tratamento do seu médico."), M, 290);
     doc.text(`${i}/${n}`, 210 - M, 290, { align: "right" });
   }
   return doc;
@@ -1376,7 +1376,7 @@ async function baixarPDF(l, btn) {
   btn.disabled = true;
   try {
     const iso = dataISO(l.dados.data_coleta) || l.criado.slice(0, 10), nome = (perfil()?.nome || "laudo").replace(/[^\p{L}\p{N}]+/gu, "-");
-    await downloads.save({ filename: `Laudai-${nome}-${iso}.pdf`, data: gerarPDF(l).output("blob") });
+    await downloads.save({ filename: `SeuLaudoai-${nome}-${iso}.pdf`, data: gerarPDF(l).output("blob") });
     toast("PDF pronto.");
   } catch (e) {
     if (e?.code === "rate_limited") toast("Aguarde um instante e tente de novo.");

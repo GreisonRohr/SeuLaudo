@@ -1,15 +1,14 @@
-# Laudai
+# SeuLaudoai
 
-> Repositório `SeuLaudo`: o produto passou a se chamar **Laudai**. Os nomes internos
-> (pacote, variáveis `SEULAUDO_*`, chaves de armazenamento) foram mantidos para não quebrar
-> instalações e dados existentes.
+> Repositório `SeuLaudo`; o produto se chama **SeuLaudoai**. Os nomes internos (pacote,
+> variáveis `SEULAUDO_*`, chaves de armazenamento) seguem como `seulaudo`.
 
 O paciente importa o laudo com o resultado dos exames (PDF do laboratório ou foto) e recebe
 uma explicação em linguagem simples: o que cada exame mede, o que o resultado significa,
 perguntas para levar ao médico, exames para conversar com ele e a evolução dos valores ao
 longo do tempo.
 
-> **Conteúdo educativo.** O Laudai não diagnostica, não prescreve e não substitui o médico.
+> **Conteúdo educativo.** O SeuLaudoai não diagnostica, não prescreve e não substitui o médico.
 > Veja [Segurança, LGPD e Anvisa](#segurança-lgpd-e-anvisa).
 
 **Versão 1 (este repositório):** sistema web para testar com laudos reais.
@@ -152,4 +151,4 @@ persistir, o paciente vê uma mensagem de erro amigável.
    (conjunto de laudos reais anonimizados com interpretação esperada).
 4. Faixas de referência por idade e sexo no catálogo, para laudos que não trazem referência.
 5. Lembretes de exames de controle e compartilhamento do relatório com o médico.
-6. Integração com o CheckExame: o laboratório entrega o laudo direto no Laudai do paciente.
+6. Integração com o CheckExame: o laboratório entrega o laudo direto no SeuLaudoai do paciente.
