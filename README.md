@@ -83,6 +83,44 @@ navegador, e a imagem do documento não é guardada depois que a página é fech
 python preview/build.py   # depois de mudar o template, os prompts ou os CSVs
 ```
 
+### Publicar no seu servidor (VPS) com o domínio seulaudoai.com.br
+
+No servidor, a página nova fica na raiz do domínio, e a leitura, a explicação e as perguntas usam
+a `ANTHROPIC_API_KEY` do servidor, pelas rotas `/api/ia/*`. Os laudos continuam guardados só no
+navegador de cada pessoa: o servidor repassa as chamadas ao Claude e não grava nada delas. A
+interface anterior, que guarda laudos no servidor, continua em `/classico`.
+
+O site exige usuário e senha (`SEULAUDO_SENHA`). Sem senha, a IA fica desligada, para ninguém
+usar a sua chave da API.
+
+**1. DNS no registro.br.** Em registro.br, entre no domínio → *DNS* → *Editar zona* (usando os
+servidores DNS do próprio Registro.br) e crie:
+
+| Tipo | Nome | Valor |
+|---|---|---|
+| A | *(vazio)* | IP do seu servidor |
+| A | www | IP do seu servidor |
+
+A mudança costuma valer em minutos, mas pode levar algumas horas.
+
+**2. No servidor** (Ubuntu 22.04 ou 24.04, portas 80 e 443 liberadas), por SSH:
+
+```bash
+curl -fsSL https://get.docker.com | sudo sh          # instala o Docker (uma vez)
+git clone https://github.com/GreisonRohr/SeuLaudo.git seulaudoai
+cd seulaudoai
+cp .env.example .env
+nano .env     # preencha ANTHROPIC_API_KEY e SEULAUDO_SENHA
+sudo docker compose -f deploy/docker-compose.yml up -d --build
+```
+
+O Caddy (`deploy/Caddyfile`) obtém o certificado HTTPS sozinho assim que o DNS apontar para o
+servidor. Depois, acesse https://seulaudoai.com.br (usuário `seulaudo` e a senha do `.env`).
+
+**Atualizar para a última versão:** `sudo ./deploy/atualizar.sh`
+**Ver os registros (logs):** `sudo docker compose -f deploy/docker-compose.yml logs -f`
+**Firewall (se usar ufw):** `sudo ufw allow 80,443/tcp`
+
 ### Publicar (Render, plano gratuito)
 
 O processo é o mesmo do CheckExame. O `Dockerfile` e o `render.yaml` já estão prontos.

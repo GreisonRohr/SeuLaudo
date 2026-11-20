@@ -14,6 +14,11 @@ CLAUDE_MODEL = os.getenv("SEULAUDO_CLAUDE_MODEL", "claude-opus-5-5")
 EFFORT_LEITURA = os.getenv("SEULAUDO_EFFORT_LEITURA", "high")
 EFFORT_INTERPRETACAO = os.getenv("SEULAUDO_EFFORT_INTERPRETACAO", "high")
 
+# Proxy de IA para a página (/api/ia/*): exige senha no site, salvo se liberado explicitamente
+IA_ABERTA = os.getenv("SEULAUDO_IA_ABERTA", "") == "1"
+EFFORT_PERGUNTAS = os.getenv("SEULAUDO_EFFORT_PERGUNTAS", "medium")
+MAX_IMAGENS = int(os.getenv("SEULAUDO_MAX_IMAGENS", "8"))
+
 # Acesso: se SEULAUDO_SENHA estiver definida, o site pede usuário e senha (HTTP Basic)
 USUARIO = os.getenv("SEULAUDO_USUARIO", "seulaudo")
 SENHA = os.getenv("SEULAUDO_SENHA", "")

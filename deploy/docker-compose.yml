@@ -1,0 +1,32 @@
+# SeuLaudoai no seu servidor (VPS): app + Caddy (HTTPS automático com Let's Encrypt)
+# Uso (na pasta do repositório):  docker compose -f deploy/docker-compose.yml up -d --build
+services:
+  app:
+    build: ..
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      SEULAUDO_DADOS: /app/dados
+    volumes:
+      - dados:/app/dados
+    expose:
+      - "8000"
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  dados:
+  caddy_data:
+  caddy_config:

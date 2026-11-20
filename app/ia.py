@@ -52,20 +52,18 @@ def bloco_documento(conteudo: bytes, mime: str) -> dict:
     raise ErroIA(f"Tipo de arquivo não suportado: {mime}. Use PDF, foto (JPG, PNG, WEBP) ou texto.")
 
 
-def chamar(system: str, conteudo: list[dict], schema: dict, effort: str, max_tokens: int = 16000) -> dict:
+def _enviar(**params):
+    """Chama a API com fallback do servidor e devolve o texto da resposta (erros viram ErroIA)."""
     ok, motivo = disponivel()
     if not ok:
         raise ErroIA(motivo)
     try:
         resposta = cliente().beta.messages.create(
             model=config.CLAUDE_MODEL,
-            max_tokens=max_tokens,
-            system=system,
-            messages=[{"role": "user", "content": conteudo}],
-            output_config={"effort": effort, "format": {"type": "json_schema", "schema": schema}},
             # se o modelo recusar por política, a API repete a chamada num modelo de fallback
             betas=["server-side-fallback-2026-07-01"],
             fallbacks="default",
+            **params,
         )
     except anthropic.AuthenticationError as e:
         raise ErroIA("Chave da API inválida (ANTHROPIC_API_KEY).") from e
@@ -85,10 +83,26 @@ def chamar(system: str, conteudo: list[dict], schema: dict, effort: str, max_tok
     texto = next((b.text for b in resposta.content if b.type == "text"), None)
     if not texto:
         raise ErroIA("Resposta sem conteúdo.")
+    return texto
+
+
+def chamar(system: str, conteudo: list[dict], schema: dict, effort: str, max_tokens: int = 16000) -> dict:
+    """Uma chamada com saída estruturada (JSON Schema)."""
+    texto = _enviar(
+        max_tokens=max_tokens,
+        system=system,
+        messages=[{"role": "user", "content": conteudo}],
+        output_config={"effort": effort, "format": {"type": "json_schema", "schema": schema}},
+    )
     try:
         return json.loads(texto)
     except json.JSONDecodeError as e:
         raise ErroIA(f"Resposta fora do formato esperado: {e}") from e
+
+
+def conversar(system: str, mensagens: list[dict], effort: str = "medium", max_tokens: int = 4000) -> str:
+    """Conversa em texto livre (perguntas do paciente sobre o laudo)."""
+    return _enviar(max_tokens=max_tokens, system=system, messages=mensagens, output_config={"effort": effort}).strip()
 
 
 def _preparar_imagem(conteudo: bytes, mime: str) -> tuple[bytes, str]:

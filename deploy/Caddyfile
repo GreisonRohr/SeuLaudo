@@ -1,0 +1,16 @@
+# O Caddy pede e renova o certificado HTTPS sozinho, assim que o DNS apontar para este servidor.
+seulaudoai.com.br {
+	encode gzip
+	request_body {
+		max_size 25MB
+	}
+	reverse_proxy app:8000 {
+		transport http {
+			read_timeout 5m
+		}
+	}
+}
+
+www.seulaudoai.com.br {
+	redir https://seulaudoai.com.br{uri} permanent
+}

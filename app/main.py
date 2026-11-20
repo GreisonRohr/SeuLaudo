@@ -248,4 +248,83 @@ def historico(perfil_id: int):
     return sorted(grupos.values(), key=lambda g: (g["categoria"], g["nome"]))
 
 
-app.mount("/", StaticFiles(directory=config.BASE_DIR / "static", html=True), name="static")
+# ------------------------------------------------------------ IA para a página
+# A página (preview/index.html) roda no navegador. No claude.ai ela usa o Claude da conta de quem
+# abre; no seu próprio servidor ela chama estas rotas, que usam a ANTHROPIC_API_KEY do servidor.
+# Os laudos continuam guardados só no navegador: o servidor não grava nada destas chamadas.
+from .extratores.claude import SCHEMA as SCHEMA_LEITURA  # noqa: E402
+from .interpretacao import SCHEMA as SCHEMA_INTERP  # noqa: E402
+
+SYSTEM_PAGINA = "Siga exatamente as instruções e o formato pedidos na mensagem do usuário."
+LIMITE_PROMPT = 120_000
+
+
+def _ia_liberada():
+    if not (config.SENHA or config.IA_ABERTA):
+        raise HTTPException(403, "Defina SEULAUDO_SENHA no servidor para liberar a IA (evita uso indevido da sua chave).")
+    ok, motivo = ia.disponivel()
+    if not ok:
+        raise HTTPException(503, motivo)
+
+
+@app.get("/api/ia/status")
+def ia_status():
+    ok, motivo = ia.disponivel()
+    liberada = bool(config.SENHA or config.IA_ABERTA)
+    return {"disponivel": ok and liberada, "motivo": motivo if not ok else ("" if liberada else "Defina SEULAUDO_SENHA no servidor."),
+            "imagens": {"maxCount": config.MAX_IMAGENS}}
+
+
+@app.post("/api/ia/json")
+def ia_json(tipo: str = Form(...), prompt: str = Form(...), imagens: list[UploadFile] | None = File(None)):
+    """Leitura ou interpretação com saída estruturada, com o schema do servidor (não o do navegador)."""
+    _ia_liberada()
+    schemas = {"leitura": (SCHEMA_LEITURA, config.EFFORT_LEITURA), "interpretacao": (SCHEMA_INTERP, config.EFFORT_INTERPRETACAO)}
+    if tipo not in schemas:
+        raise HTTPException(400, "Tipo inválido")
+    if len(prompt) > LIMITE_PROMPT:
+        raise HTTPException(413, "Pedido grande demais")
+    imagens = [i for i in (imagens or []) if i.filename][: config.MAX_IMAGENS]
+    try:
+        blocos = []
+        for img in imagens:
+            dados = img.file.read()
+            if len(dados) > TAMANHO_MAXIMO:
+                raise HTTPException(413, "Imagem maior que 20 MB")
+            blocos.append(ia.bloco_documento(dados, _detectar_mime(img)))
+        schema, effort = schemas[tipo]
+        return ia.chamar(SYSTEM_PAGINA, blocos + [{"type": "text", "text": prompt}], schema, effort)
+    except ia.ErroIA as e:
+        raise HTTPException(502, str(e)) from e
+
+
+class Conversa(BaseModel):
+    mensagens: list[dict]
+
+
+@app.post("/api/ia/texto")
+def ia_texto(c: Conversa):
+    """Perguntas do paciente sobre o laudo (texto livre)."""
+    _ia_liberada()
+    msgs = [{"role": m.get("role"), "content": str(m.get("content", ""))} for m in c.mensagens[-21:]]
+    if not msgs or msgs[-1]["role"] != "user" or any(m["role"] not in ("user", "assistant") for m in msgs):
+        raise HTTPException(400, "Conversa inválida")
+    if sum(len(m["content"]) for m in msgs) > LIMITE_PROMPT:
+        raise HTTPException(413, "Conversa grande demais")
+    while msgs and msgs[0]["role"] != "user":
+        msgs.pop(0)
+    try:
+        return {"text": ia.conversar(SYSTEM_PAGINA, msgs, config.EFFORT_PERGUNTAS), "truncated": False}
+    except ia.ErroIA as e:
+        raise HTTPException(502, str(e)) from e
+
+
+# ------------------------------------------------------------ páginas
+@app.get("/", include_in_schema=False)
+def pagina():
+    """A página nova (a mesma da prévia), gerada por preview/build.py."""
+    return FileResponse(config.BASE_DIR / "preview" / "index.html", media_type="text/html")
+
+
+# Versão anterior da interface (usa as rotas /api/perfis e /api/laudos, que guardam no servidor)
+app.mount("/classico", StaticFiles(directory=config.BASE_DIR / "static", html=True), name="classico")

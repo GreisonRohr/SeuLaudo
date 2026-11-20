@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SeuLaudoai — prévia</title>
+<title>SeuLaudoai — entenda seus exames</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -287,7 +287,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;colo
 </svg>
 
 <header class="topo"><div class="topo-in">
-  <div class="logo"><b><svg class="i"><use href="#i-doc"/></svg></b><span>SeuLaudo<em>ai</em></span> <small>prévia</small></div>
+  <div class="logo"><b><svg class="i"><use href="#i-doc"/></svg></b><span>SeuLaudo<em>ai</em></span> <small>beta</small></div>
   <div class="perfil-wrap" id="perfilWrap" hidden>
     <button class="perfil-btn" id="bPerfil" aria-haspopup="menu" aria-expanded="false"><span class="avatar" id="perfilAv"></span><span id="perfilNome"></span><svg class="i" style="width:16px;height:16px"><use href="#i-baixo"/></svg></button>
     <div class="menu" id="menuPerfil" role="menu" hidden></div>
@@ -337,7 +337,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;colo
       <strong style="display:flex;gap:8px;align-items:center"><svg class="i"><use href="#i-escudo"/></svg>Seus dados de saúde</strong>
       <ul>
         <li>Laudos são dados sensíveis pela LGPD. Nesta prévia, ficam guardados só neste navegador, e você pode apagar tudo quando quiser.</li>
-        <li>Para ler e explicar o laudo, as imagens e os valores são enviados ao Claude pela sua conta do claude.ai. O seu nome não vai no pedido de explicação.</li>
+        <li>Para ler e explicar o laudo, as imagens e os valores são enviados à IA (Claude, da Anthropic). O seu nome não vai no pedido de explicação.</li>
         <li>A explicação é educativa: não é diagnóstico e não substitui o seu médico.</li>
       </ul>
     </div>
@@ -603,9 +603,49 @@ function lerTexto(texto) {
 
 /* ---------------- Claude ---------------- */
 let sample = null, limites = null, claudeChecado = false;
+/* Fora do claude.ai, a página usa o servidor do SeuLaudoai (rotas /api/ia/*), que chama o Claude
+   com a chave da API do servidor. Mesma interface do "sample" do claude.ai. */
+const servidor = { ativo: false, motivo: "", limites: null };
+async function iaDoServidor() {
+  try {
+    const r = await fetch("api/ia/status", { cache: "no-store" });
+    if (!r.ok) return null;
+    const st = await r.json(); servidor.motivo = st.motivo || "";
+    if (!st.disponivel) return null;
+    servidor.ativo = true; servidor.limites = { images: st.imagens };
+    const erro = async r => {
+      let m = "Falha ao falar com o servidor. Tente de novo.";
+      try { const j = await r.json(); if (typeof j.detail === "string") m = j.detail; } catch {}
+      const e = new Error(m); if (r.status === 429) e.code = "rate_limited"; return e;
+    };
+    const s = async (mensagens, opts = {}) => {
+      const r = await fetch("api/ia/texto", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mensagens }), signal: opts.signal });
+      if (!r.ok) throw await erro(r);
+      const j = await r.json(); opts.onText?.({ text: j.text, delta: j.text }); return j;
+    };
+    s.limits = async () => servidor.limites;
+    s.json = async (prompt, opts = {}) => {
+      const fd = new FormData();
+      fd.append("tipo", prompt.startsWith(PROMPT_INTERP) ? "interpretacao" : "leitura");
+      fd.append("prompt", prompt);
+      (opts.images || []).forEach((b, i) => fd.append("imagens", b, b.name || `pagina-${i + 1}.jpg`));
+      const r = await fetch("api/ia/json", { method: "POST", body: fd, signal: opts.signal });
+      if (!r.ok) throw await erro(r);
+      return r.json();
+    };
+    return s;
+  } catch { return null; }
+}
+function indisponivel(oque) {
+  if (window.claude) return `${oque} não está disponível nesta visualização.`;
+  if (servidor.motivo) return `${oque} não está disponível: ${servidor.motivo}`;
+  return `${oque} não está disponível aqui. Abra o SeuLaudoai pelo site ou pelo claude.ai.`;
+}
 (async () => {
-  try { sample = await window.claude?.use("sample"); } catch { sample = null; }
-  if (sample) limites = await sample.limits().catch(() => null);
+  if (window.claude) {
+    try { sample = await window.claude.use("sample"); } catch { sample = null; }
+    if (sample) limites = await sample.limits().catch(() => null);
+  } else { sample = await iaDoServidor(); if (sample) limites = servidor.limites; }
   claudeChecado = true; avisoClaude();
 })();
 setTimeout(() => { claudeChecado = true; avisoClaude(); }, 11000);
@@ -613,8 +653,7 @@ function avisoClaude() {
   const el = $("#avisoClaude"), modo = modoAtual();
   let m = "";
   if (modo === "claude") {
-    if (!window.claude) m = "Abra esta página no claude.ai para ler o laudo com IA.";
-    else if (claudeChecado && !sample) m = "A leitura com IA não está disponível nesta visualização. Use a opção Ler sem IA em Mais opções.";
+    if (claudeChecado && !sample) m = indisponivel("A leitura com IA") + " Por enquanto, use a opção Ler sem IA em Mais opções.";
     else if (sample && limites && !limites.images) m = "Envio de imagens ao Claude indisponível aqui: só texto colado ou PDF digital.";
   }
   el.innerHTML = m ? `<div class="aviso">${esc(m)}</div>` : "";
@@ -796,7 +835,7 @@ $("#fEnv").addEventListener("submit", async ev => {
       }
       previa = { tipo: "texto", t }; d = lerTexto(t);
     } else {
-      if (!sample) throw new Error(window.claude ? "A leitura com IA não está disponível nesta visualização." : "Abra esta página no claude.ai para ler o laudo com IA.");
+      if (!sample) throw new Error(indisponivel("A leitura com IA"));
       let imgs = null, extra = "";
       if (f && (f.type === "application/pdf" || f.type.startsWith("image/"))) {
         if (!limites?.images) {
@@ -967,7 +1006,7 @@ async function interpretar(basico) {
     let it;
     if (basico) it = interpBasica(d, hist);
     else {
-      if (!sample) throw new Error(window.claude ? "A explicação com IA não está disponível nesta visualização. Use a explicação sem IA." : "Abra esta página no claude.ai para a explicação com IA.");
+      if (!sample) throw new Error(indisponivel("A explicação com IA") + " Use a explicação sem IA.");
       const ent = structuredClone(d); delete ent.paciente.nome; delete ent.campos_incertos; delete ent.alertas_leitura; delete ent.legibilidade;
       for (const r of ent.resultados) { if (hist[r.codigo]) r.historico = hist[r.codigo]; delete r.valor_numerico; delete r.nome_padrao; delete r.mensagem_critica; }
       ctl = new AbortController();
@@ -1269,7 +1308,7 @@ function entradaIA(d) {
 async function perguntar(l, q) {
   q = q.trim(); if (!q || chatCtl) return;
   const msg = $("#msgChat"); msg.innerHTML = "";
-  if (!sample) { msg.innerHTML = `<div class="aviso">${window.claude ? "As perguntas com IA não estão disponíveis nesta visualização." : "Abra esta página no claude.ai para fazer perguntas."}</div>`; return; }
+  if (!sample) { msg.innerHTML = `<div class="aviso">${esc(indisponivel("As perguntas com IA"))}</div>`; return; }
   l.chat ||= [];
   const msgs = $("#msgs"); $(".sugest")?.remove();
   msgs.insertAdjacentHTML("beforeend", `<div class="balao eu">${esc(q)}</div><div class="balao ia" id="resp"><span class="sub"><span class="spin-pt">Pensando…</span></span></div>`);
@@ -1295,8 +1334,28 @@ function ligarOuvirChat(l) { $$("[data-ouvir-k]").forEach(b => { b.onclick = () 
 
 /* ---------------- ouvir (voz) ---------------- */
 let tts = null, falandoBtn = null;
+function vozDoNavegador() { // fora do claude.ai: a voz do próprio navegador, em português
+  if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") return null;
+  let cb = null;
+  return {
+    onState(f) { cb = f; },
+    stop() { speechSynthesis.cancel(); cb?.({ state: "idle", reason: "viewer_stopped" }); },
+    speak(texto, o = {}) {
+      return new Promise((ok, err) => {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(texto); u.lang = o.language || "pt-BR";
+        const v = speechSynthesis.getVoices().find(x => (x.lang || "").toLowerCase().startsWith("pt-br")) || speechSynthesis.getVoices().find(x => (x.lang || "").toLowerCase().startsWith("pt"));
+        if (v) u.voice = v;
+        u.onstart = () => cb?.({ state: "speaking" });
+        u.onend = () => { cb?.({ state: "idle", reason: "completed" }); ok(); };
+        u.onerror = e => { cb?.({ state: "idle", reason: "error" }); ["interrupted", "canceled"].includes(e.error) ? ok() : err({ code: "unavailable" }); };
+        speechSynthesis.speak(u);
+      });
+    }
+  };
+}
 (async () => {
-  try { tts = await window.claude?.use("tts"); } catch { tts = null; }
+  try { tts = window.claude ? await window.claude.use("tts") : vozDoNavegador(); } catch { tts = null; }
   if (!tts) return;
   document.body.classList.add("tem-voz");
   tts.onState(({ state }) => { if (state === "idle" && falandoBtn) { falandoBtn.classList.remove("falando"); falandoBtn = null; } });
@@ -1320,7 +1379,15 @@ function textoOuvir(l) {
 /* ---------------- PDF ---------------- */
 let downloads = null;
 (async () => {
-  try { downloads = await window.claude?.use("downloads"); } catch { downloads = null; }
+  try {
+    downloads = window.claude ? await window.claude.use("downloads") : {
+      async save({ filename, data }) {
+        const url = URL.createObjectURL(data instanceof Blob ? data : new Blob([data]));
+        const a = document.createElement("a"); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 10000); return { status: "saved" };
+      }
+    };
+  } catch { downloads = null; }
   if (downloads && window.jspdf) document.body.classList.add("tem-pdf");
 })();
 const SIT_PDF = { normal: "Normal", alto: "Alto", baixo: "Baixo", alterado: "Alterado", sem_referencia: "Sem ref." };
