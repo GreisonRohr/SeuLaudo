@@ -1,4 +1,4 @@
-"""API web do SeuLaudo — o paciente importa o laudo e recebe uma explicação em linguagem simples."""
+"""API web do Laudai — o paciente importa o laudo e recebe uma explicação em linguagem simples."""
 from __future__ import annotations
 
 import base64
@@ -21,7 +21,7 @@ from .valores import classificar
 
 TAMANHO_MAXIMO = 20 * 1024 * 1024
 
-app = FastAPI(title="SeuLaudo", version="0.1.0")
+app = FastAPI(title="Laudai", version="0.1.0")
 catalogo = Catalogo.carregar()
 extratores = criar_extratores()
 db.init()
@@ -40,7 +40,7 @@ async def exigir_senha(request: Request, call_next):
             usuario = senha = ""
         if secrets.compare_digest(usuario, config.USUARIO) and secrets.compare_digest(senha, config.SENHA):
             return await call_next(request)
-    return Response("Acesso restrito", status_code=401, headers={"WWW-Authenticate": 'Basic realm="SeuLaudo"'})
+    return Response("Acesso restrito", status_code=401, headers={"WWW-Authenticate": 'Basic realm="Laudai"'})
 
 
 @app.get("/saude")
