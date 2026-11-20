@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SeuLaudo — prévia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calma, clínica, clara; fala com o paciente, não com o médico.
+   IDEA: o laudo impresso do laboratório, relido com um tradutor ao lado.
+   PICTURE: a tabela de resultados com selos e a faixa de referência; na evolução, o gráfico por exame.
+   COLOUR and TYPE: papel branco, tinta azul-petróleo profunda, laranja para "fora da referência", vermelho só para crítico; IBM Plex Sans.
+   LAYOUT: uma coluna calma para enviar e ler; documento ao lado da conferência a partir de 900px. */
+:root{color-scheme:light dark;
+  --bg:light-dark(#f3f5f7,#101418);--papel:light-dark(#ffffff,#171d23);--ink:light-dark(#14212e,#e8edf2);--sub:light-dark(#566270,#a3afbb);
+  --linha:light-dark(#dde3e9,#2b343d);--marca:light-dark(#0e4a6e,#7cc0e8);--marca-ink:light-dark(#ffffff,#0b1a24);--suave:light-dark(#e7f0f6,#1d2a34);
+  --ok:light-dark(#0d6b2f,#6fd393);--ok-bg:light-dark(#e6f4ea,#173222);--fora:light-dark(#8a4b00,#f2b866);--fora-bg:light-dark(#fff1de,#3a2a12);
+  --crit:light-dark(#b42318,#ff8a80);--crit-bg:light-dark(#fdecea,#3d1a17);--serie:light-dark(#2a78d6,#5aa0f0);--faixa:light-dark(rgba(13,107,47,.11),rgba(111,211,147,.14));
+  --amarelo:light-dark(#fff7dc,#3a3214)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif;overflow-x:clip}
+header{background:var(--marca);color:var(--marca-ink);padding:14px max(4vw,16px);display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+header h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
+header h1 small{font-weight:400;font-size:14px;opacity:.8;margin-left:6px}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:transparent;color:inherit;border:0;min-height:40px;padding:6px 14px;border-radius:8px;font:inherit;font-size:15px;cursor:pointer}
+nav button.ativo,nav button:hover{background:color-mix(in srgb,var(--marca-ink) 18%,transparent)}
+.faixa-aviso{background:var(--amarelo);color:var(--ink);font-size:14px;padding:7px max(4vw,16px);text-align:center;border-bottom:1px solid var(--linha)}
+main{max-width:1240px;margin:0 auto;padding:20px max(3vw,12px) 48px}
+.card{background:var(--papel);border:1px solid var(--linha);border-radius:12px;padding:clamp(16px,2.5vw,26px)}
+.estreito{max-width:720px;margin:0 auto}
+h2{font-size:clamp(22px,3vw,30px);line-height:1.15;margin:0 0 6px;text-wrap:balance}
+h3{font-size:18px;margin:22px 0 8px}
+p{margin:6px 0}.sub{color:var(--sub)}.pequeno{font-size:14px}
+label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--sub)}
+input,select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--papel);border:1px solid var(--linha);border-radius:8px;padding:8px 10px;width:100%}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid color-mix(in srgb,var(--serie) 55%,transparent);outline-offset:1px}
+input.incerto{background:var(--amarelo);border-color:#d9a300}
+button{font:inherit;font-size:15px;min-height:44px;padding:8px 18px;border-radius:8px;border:1px solid var(--linha);background:var(--papel);color:var(--ink);cursor:pointer}
+button:hover{background:var(--suave)}button:disabled{opacity:.5;cursor:default}
+button.pri{background:var(--marca);border-color:var(--marca);color:var(--marca-ink);font-weight:600}
+button.perigo{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 40%,transparent)}
+button.mini{min-height:34px;padding:4px 10px;font-size:14px}
+.linha{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}.linha>label{flex:1 1 160px}
+.col{display:flex;flex-direction:column;gap:14px}
+.aviso{border-radius:10px;padding:10px 14px;font-size:15px;background:var(--amarelo);border:1px solid color-mix(in srgb,#d9a300 45%,transparent)}
+.aviso.erro,.alerta-crit{background:var(--crit-bg);border:1px solid color-mix(in srgb,var(--crit) 35%,transparent);color:var(--ink)}
+.aviso ul,.alerta-crit ul{margin:4px 0 0;padding-left:20px}
+#drop{border:2px dashed var(--linha);border-radius:12px;padding:22px 14px;text-align:center}
+#drop.on{border-color:var(--serie);background:var(--suave)}
+.btnf{display:inline-flex;align-items:center;min-height:48px;padding:10px 22px;border:1px solid var(--linha);border-radius:10px;font-size:16px;color:var(--ink);background:var(--papel);cursor:pointer;position:relative;overflow:hidden}
+.btnf.pri{background:var(--marca);border-color:var(--marca);color:var(--marca-ink);font-weight:600}
+.btnf input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.botoes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+#mini{display:block;max-width:200px;max-height:200px;margin:10px auto 0;border-radius:8px;border:1px solid var(--linha)}
+#mini[hidden]{display:none}
+.modos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:8px}
+.modos label{flex-direction:row;gap:10px;align-items:flex-start;border:1px solid var(--linha);border-radius:10px;padding:10px 12px;color:var(--ink);cursor:pointer}
+.modos input{width:auto;margin-top:5px}.modos b{display:block}
+.termo{background:var(--suave);border-radius:10px;padding:12px 16px;font-size:15px}.termo ul{margin:6px 0 10px;padding-left:20px}
+.check{flex-direction:row;align-items:flex-start;gap:10px;color:var(--ink);font-size:15px}.check input{width:auto;margin-top:5px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--linha);border-top-color:var(--serie);border-radius:50%;animation:g 1s linear infinite;vertical-align:-2px;margin-right:8px}
+@keyframes g{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.spin{animation:none}}
+.dividido{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:16px;align-items:start}
+@media(max-width:900px){.dividido{grid-template-columns:minmax(0,1fr)}}
+.doc{position:sticky;top:12px}@media(max-width:900px){.doc{position:static}}
+#docPrev{max-height:calc(100vh - 120px);overflow:auto;background:var(--bg);border-radius:8px}
+@media(max-width:900px){#docPrev{max-height:55vh}}
+#docPrev img{width:100%;display:block;margin-bottom:6px;cursor:zoom-in}#docPrev img.zoom{width:200%;cursor:zoom-out}
+#docPrev pre{white-space:pre-wrap;margin:0;padding:12px;font-size:13px;background:var(--papel)}
+.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:10px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:13px;color:var(--sub);font-weight:500;padding:6px 4px;border-bottom:1px solid var(--linha)}
+td{padding:5px 4px;border-bottom:1px solid var(--linha);vertical-align:middle}
+#tabRes input{padding:6px 8px}#tabRes td small{display:block;color:var(--sub);font-size:13px}
+#tabRes td:nth-child(1){min-width:150px}#tabRes td:nth-child(2),#tabRes td:nth-child(3){min-width:92px}#tabRes td:nth-child(4){min-width:150px}
+.selo{display:inline-flex;gap:5px;align-items:center;font-size:13px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.selo.normal{color:var(--ok);background:var(--ok-bg)}.selo.alto,.selo.baixo,.selo.alterado{color:var(--fora);background:var(--fora-bg)}
+.selo.critico{color:#fff;background:#b42318}.selo.sem_referencia{color:var(--sub);background:var(--suave)}
+.acoes{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.resumo{font-size:17px;background:var(--suave);border-radius:10px;padding:14px 18px;margin:14px 0}
+.itens{display:grid;gap:10px}
+.item{border:1px solid var(--linha);border-radius:10px;padding:12px 16px;background:var(--papel)}
+.item.fora{border-left:5px solid #e8a33c}.item.critico{border-left:5px solid #b42318}
+.item .t{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.item .v{font-size:16px}.item .v small{color:var(--sub);font-size:14px}
+.item ul{margin:4px 0;padding-left:20px}
+summary{cursor:pointer;color:var(--serie);margin:10px 0;min-height:32px}
+.legal{font-size:14px;color:var(--sub);border-top:1px solid var(--linha);padding-top:12px;margin-top:22px}
+.laudo-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid var(--linha);cursor:pointer;flex-wrap:wrap}
+.laudo-item:hover{background:var(--suave)}
+.vazio{text-align:center;padding:32px 10px;color:var(--sub)}
+#graficos{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:14px}
+.graf{border:1px solid var(--linha);border-radius:10px;padding:12px 14px;background:var(--papel)}
+.graf h4{margin:0;font-size:16px}.graf .s{font-size:13px;color:var(--sub);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fig{position:relative;height:160px;margin-top:6px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.fig text{font-size:12px;fill:var(--sub)}
+#tip{position:fixed;z-index:9;pointer-events:none;background:var(--papel);border:1px solid var(--linha);border-radius:8px;padding:6px 10px;font-size:14px;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--papel);padding:10px 18px;border-radius:10px;z-index:10;max-width:92vw}
+@media(max-width:600px){table{font-size:14px}header{gap:8px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>SeuLaudo<small>prévia</small></h1>
+  <nav>
+    <button data-v="enviar">Enviar laudo</button>
+    <button data-v="laudos">Meus laudos</button>
+    <button data-v="evolucao">Evolução</button>
+  </nav>
+</header>
+<div class="faixa-aviso">Conteúdo educativo. Não substitui a consulta, o diagnóstico ou o tratamento do seu médico.</div>
+
+<main>
+<section id="v-inicio" hidden>
+  <div class="card estreito col">
+    <h2>Entenda o resultado dos seus exames</h2>
+    <p class="sub">Envie o laudo do laboratório (PDF ou foto). O SeuLaudo lê os valores, você confere e recebe uma explicação em linguagem simples, com perguntas para levar ao médico.</p>
+    <div class="linha">
+      <label>Data de nascimento <input id="pNasc" placeholder="DD/MM/AAAA" inputmode="numeric"></label>
+      <label>Sexo <select id="pSexo"><option value=""></option><option value="F">Feminino</option><option value="M">Masculino</option></select></label>
+    </div>
+    <div class="termo">
+      <strong>Uso dos seus dados de saúde</strong>
+      <ul>
+        <li>Laudos são dados de saúde, considerados <em>dados sensíveis</em> pela LGPD.</li>
+        <li>Nesta prévia, os resultados ficam guardados apenas neste navegador. Você pode apagar tudo em "Meus laudos".</li>
+        <li>Para ler e explicar o laudo, as imagens e os valores são enviados ao Claude pela sua conta do claude.ai. O nome não é enviado no pedido de explicação.</li>
+        <li>A explicação é educativa: não é diagnóstico e não substitui o seu médico.</li>
+      </ul>
+      <label class="check"><input type="checkbox" id="pAceite"> Li e concordo com o uso dos meus dados de saúde para essas finalidades.</label>
+    </div>
+    <div><button class="pri" id="bComecar">Começar</button></div>
+  </div>
+</section>
+
+<section id="v-enviar" hidden>
+  <form id="fEnv" class="card estreito col">
+    <h2>Enviar laudo</h2>
+    <div id="drop">
+      <div class="botoes">
+        <label class="btnf pri">Escolher arquivo<input type="file" id="arq" accept="image/*,application/pdf,text/plain"></label>
+        <label class="btnf">Tirar foto<input type="file" id="cam" accept="image/*" capture="environment"></label>
+      </div>
+      <p class="sub pequeno">PDF do laboratório ou foto do laudo, com boa luz e sem reflexo. No computador, arraste o arquivo para cá ou cole uma imagem.</p>
+      <p id="nomeArq" style="font-weight:600;color:var(--serie)"></p>
+      <img id="mini" alt="Laudo selecionado" hidden>
+    </div>
+    <details id="detTexto"><summary>…ou colar o texto do laudo</summary>
+      <textarea id="txt" rows="8" placeholder="Glicose ....: 105 mg/dL   VR: 70 a 99 mg/dL"></textarea>
+      <button type="button" class="mini" id="bEx" style="margin-top:8px">Usar laudo de exemplo</button>
+    </details>
+    <div class="modos">
+      <label><input type="radio" name="modo" value="claude" checked><span><b>Leitura com Claude</b><span class="sub pequeno">PDF, foto ou texto. Lê laudos de imagem também.</span></span></label>
+      <label><input type="radio" name="modo" value="regras"><span><b>Leitura por regras</b><span class="sub pequeno">Sem IA. Só texto e PDF digital.</span></span></label>
+    </div>
+    <div id="avisoClaude"></div>
+    <div id="msgEnv"></div>
+    <div class="acoes" style="margin-top:0">
+      <button type="submit" class="pri" id="bLer">Ler laudo</button>
+      <button type="button" id="bParar" hidden>Parar</button>
+      <span id="lendo" class="sub"></span>
+    </div>
+  </form>
+</section>
+
+<section id="v-conferir" hidden>
+  <div class="dividido">
+    <div class="card doc"><strong>Documento enviado</strong><div id="docPrev" style="margin-top:8px"></div></div>
+    <form id="fConf" class="card">
+      <h2>Confira a leitura</h2>
+      <p class="sub">Compare com o documento e corrija o que estiver diferente. Campos lidos com dúvida aparecem em amarelo. A explicação usa exatamente estes valores.</p>
+      <div id="alertasLeitura"></div>
+      <div class="grade">
+        <label>Tipo <select data-c="tipo"><option value="laboratorial">Exames laboratoriais</option><option value="imagem">Exame de imagem</option><option value="outro">Outro laudo descritivo</option></select></label>
+        <label>Data da coleta <input data-c="data_coleta" placeholder="DD/MM/AAAA"></label>
+        <label>Laboratório / clínica <input data-c="laboratorio"></label>
+        <label>Sexo <select data-c="paciente.sexo"><option value=""></option><option value="F">Feminino</option><option value="M">Masculino</option></select></label>
+        <label>Idade <input data-c="paciente.idade"></label>
+      </div>
+      <h3>Resultados</h3>
+      <div class="scroll"><table id="tabRes"><thead><tr><th>Exame</th><th>Resultado</th><th>Unidade</th><th>Referência</th><th>Situação</th><th></th></tr></thead><tbody></tbody></table></div>
+      <button type="button" class="mini" id="bAdd" style="margin-top:8px">+ Adicionar resultado</button>
+      <div id="blocoDesc">
+        <h3>Laudo descritivo</h3>
+        <div class="col">
+          <label>Exame <input data-c="titulo_exame"></label>
+          <label>Achados <textarea data-c="achados" rows="5"></textarea></label>
+          <label>Conclusão <textarea data-c="conclusao" rows="3"></textarea></label>
+        </div>
+      </div>
+      <div class="acoes">
+        <button type="submit" class="pri" id="bInterp">Salvar e explicar com Claude</button>
+        <button type="button" id="bBasico">Explicação básica (sem IA)</button>
+        <span id="interpretando" class="sub"></span>
+      </div>
+      <div id="msgConf" style="margin-top:10px"></div>
+    </form>
+  </div>
+</section>
+
+<section id="v-laudo" hidden><article class="card estreito" id="relatorio" style="max-width:880px"></article></section>
+
+<section id="v-laudos" hidden>
+  <div class="card estreito col" style="max-width:880px">
+    <div class="linha" style="justify-content:space-between"><h2>Meus laudos</h2><button class="pri" data-ir="enviar">Enviar novo laudo</button></div>
+    <div id="lista"></div>
+    <details><summary>Apagar meus dados</summary>
+      <p class="sub">Apaga todos os laudos, explicações e o histórico guardados neste navegador.</p>
+      <button class="perigo" id="bApagar">Apagar tudo</button>
+    </details>
+  </div>
+</section>
+
+<section id="v-evolucao" hidden>
+  <div class="card col">
+    <h2>Evolução dos seus exames</h2>
+    <p class="sub">Cada gráfico junta o mesmo exame de laudos diferentes, mesmo de laboratórios diferentes. A faixa verde é a referência do laboratório; pontos em vermelho ficaram fora dela. Só entram no gráfico valores com a mesma unidade.</p>
+    <label style="max-width:380px">Mostrar <select id="filtroEv"><option value="todos">Todos os exames</option><option value="fora">Só os que já vieram fora da referência</option></select></label>
+    <div id="graficos"></div>
+  </div>
+</section>
+</main>
+<div id="tip" hidden></div>
+<div id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script>
+{
+const ANALITOS_RAW = [["GLI", "Glicose", "glicemia|glicemia de jejum|glicose de jejum|glicose jejum|glicose plasmatica", "Metabolismo", "Quantidade de açúcar no sangue no momento da coleta. Ajuda a rastrear e acompanhar pré-diabetes e diabetes."], ["HBA1C", "Hemoglobina glicada", "hba1c|a1c|hemoglobina glicosilada|glicohemoglobina", "Metabolismo", "Média aproximada da glicose no sangue nos últimos 2 a 3 meses. Usada para diagnosticar e acompanhar o diabetes."], ["INS", "Insulina", "insulina basal|insulina de jejum", "Metabolismo", "Hormônio que leva a glicose do sangue para as células. Ajuda a avaliar resistência à insulina."], ["COLT", "Colesterol total", "colesterol", "Lipídios", "Soma das frações de colesterol no sangue. Interpretado junto com HDL, LDL e triglicerídeos."], ["HDL", "Colesterol HDL", "hdl|hdl colesterol|colesterol bom", "Lipídios", "Fração do colesterol que ajuda a retirar gordura das artérias. Valores mais altos costumam ser protetores."], ["LDL", "Colesterol LDL", "ldl|ldl colesterol|colesterol ruim", "Lipídios", "Fração do colesterol que pode se depositar nas artérias. A meta depende do risco cardiovascular de cada pessoa."], ["NHDL", "Colesterol não-HDL", "nao hdl|colesterol nao hdl", "Lipídios", "Todo o colesterol exceto o HDL. Reflete as partículas que podem se acumular nas artérias."], ["VLDL", "Colesterol VLDL", "vldl", "Lipídios", "Fração do colesterol ligada ao transporte de triglicerídeos."], ["TRIG", "Triglicerídeos", "triglicerides|triglicerideos|triglicérides|tg", "Lipídios", "Tipo de gordura no sangue que sobe com açúcar, álcool, excesso de calorias e falta de jejum adequado."], ["HB", "Hemoglobina", "hgb|hb", "Hemograma", "Proteína dos glóbulos vermelhos que transporta oxigênio. Valores baixos indicam anemia."], ["HT", "Hematócrito", "htc|ht|hct", "Hemograma", "Porcentagem do sangue ocupada pelos glóbulos vermelhos."], ["HEM", "Hemácias", "eritrocitos|eritrócitos|globulos vermelhos|rbc", "Hemograma", "Quantidade de glóbulos vermelhos, as células que levam oxigênio ao corpo."], ["VCM", "VCM", "volume corpuscular medio", "Hemograma", "Tamanho médio dos glóbulos vermelhos. Ajuda a investigar o tipo de anemia (por exemplo, falta de ferro ou de vitamina B12)."], ["HCM", "HCM", "hemoglobina corpuscular media", "Hemograma", "Quantidade média de hemoglobina em cada glóbulo vermelho."], ["CHCM", "CHCM", "concentracao de hemoglobina corpuscular media", "Hemograma", "Concentração média de hemoglobina dentro dos glóbulos vermelhos."], ["RDW", "RDW", "rdw cv", "Hemograma", "Variação de tamanho entre os glóbulos vermelhos. Aumenta em algumas anemias."], ["LEU", "Leucócitos", "leucocitos totais|globulos brancos|wbc", "Hemograma", "Total de glóbulos brancos, as células de defesa. Podem subir em infecções e inflamações."], ["NEU", "Neutrófilos", "segmentados|neutrofilos segmentados", "Hemograma", "Glóbulos brancos que combatem principalmente bactérias."], ["LIN", "Linfócitos", "linfocitos", "Hemograma", "Glóbulos brancos ligados à defesa contra vírus e à memória imunológica."], ["MON", "Monócitos", "monocitos", "Hemograma", "Glóbulos brancos que fagocitam (englobam) microrganismos e restos celulares."], ["EOS", "Eosinófilos", "eosinofilos", "Hemograma", "Glóbulos brancos que aumentam em alergias e verminoses."], ["BAS", "Basófilos", "basofilos", "Hemograma", "Glóbulos brancos raros, ligados a reações alérgicas."], ["PLT", "Plaquetas", "contagem de plaquetas|plaquetas totais|plt", "Hemograma", "Fragmentos de células que ajudam na coagulação do sangue."], ["UREIA", "Ureia", "ureia serica", "Rins", "Resíduo do metabolismo das proteínas, eliminado pelos rins. Também varia com a hidratação e a dieta."], ["CREA", "Creatinina", "creatinina serica", "Rins", "Resíduo dos músculos eliminado pelos rins. É o principal exame de sangue para avaliar a função renal."], ["TFG", "Taxa de filtração glomerular", "tfg|tfge|ritmo de filtracao glomerular|egfr|filtracao glomerular estimada", "Rins", "Estimativa de quanto sangue os rins filtram por minuto, calculada a partir da creatinina, idade e sexo."], ["AU", "Ácido úrico", "acido urico", "Metabolismo", "Resíduo do metabolismo das purinas. Valores altos estão ligados à gota e a pedras nos rins."], ["NA", "Sódio", "sodio", "Eletrólitos", "Mineral que regula a água do corpo e a pressão arterial."], ["K", "Potássio", "potassio", "Eletrólitos", "Mineral essencial para o funcionamento dos músculos e do coração."], ["CA", "Cálcio", "calcio|calcio total", "Eletrólitos", "Mineral dos ossos, também importante para músculos, nervos e coração."], ["MG", "Magnésio", "magnesio", "Eletrólitos", "Mineral que participa da função muscular, nervosa e do ritmo cardíaco."], ["TGO", "AST (TGO)", "tgo|ast|transaminase oxalacetica|aspartato aminotransferase", "Fígado", "Enzima presente no fígado, músculos e coração. Sobe quando há lesão dessas células."], ["TGP", "ALT (TGP)", "tgp|alt|transaminase piruvica|alanina aminotransferase", "Fígado", "Enzima mais específica do fígado. Sobe quando há inflamação ou lesão hepática."], ["GGT", "Gama GT", "gama glutamil transferase|gamaglutamiltransferase|ggt", "Fígado", "Enzima do fígado e das vias biliares. Pode subir com álcool, alguns medicamentos e gordura no fígado."], ["FA", "Fosfatase alcalina", "fosfatase alcalina total", "Fígado", "Enzima do fígado, vias biliares e ossos."], ["BT", "Bilirrubina total", "bilirrubinas totais", "Fígado", "Pigmento produzido pela quebra das hemácias e eliminado pelo fígado. Em excesso causa pele amarelada."], ["ALB", "Albumina", "albumina serica", "Fígado", "Principal proteína do sangue, produzida pelo fígado. Reflete nutrição e função hepática."], ["TSH", "TSH", "hormonio tireoestimulante|tireotrofina", "Tireoide", "Hormônio da hipófise que comanda a tireoide. Costuma ser o primeiro exame para avaliar a tireoide."], ["T4L", "T4 livre", "t4l|tiroxina livre", "Tireoide", "Principal hormônio produzido pela tireoide, na forma ativa."], ["T3", "T3", "triiodotironina|t3 total", "Tireoide", "Hormônio da tireoide, forma mais ativa do T4."], ["FERRO", "Ferro sérico", "ferro", "Ferro e vitaminas", "Quantidade de ferro circulando no sangue no momento da coleta."], ["FERRI", "Ferritina", "ferritina serica", "Ferro e vitaminas", "Estoque de ferro do corpo. Baixa na falta de ferro e pode subir em inflamações e excesso de ferro."], ["TRANSF", "Transferrina", "saturacao de transferrina|indice de saturacao de transferrina", "Ferro e vitaminas", "Proteína que transporta o ferro no sangue."], ["B12", "Vitamina B12", "cobalamina|cianocobalamina", "Ferro e vitaminas", "Vitamina essencial para os nervos e a formação do sangue."], ["VITD", "Vitamina D", "25 oh vitamina d|25 hidroxivitamina d|vitamina d 25 hidroxi|25oh d", "Ferro e vitaminas", "Vitamina ligada à saúde dos ossos, produzida com exposição ao sol."], ["AF", "Ácido fólico", "folato", "Ferro e vitaminas", "Vitamina do complexo B importante para a formação das células do sangue."], ["PCR", "Proteína C reativa", "pcr|pcr ultrassensivel|proteina c reativa ultrassensivel", "Inflamação", "Proteína que sobe em inflamações e infecções."], ["VHS", "VHS", "velocidade de hemossedimentacao|hemossedimentacao", "Inflamação", "Exame inespecífico que sobe em inflamações, infecções e outras condições."], ["PSA", "PSA total", "psa|antigeno prostatico especifico", "Próstata", "Proteína produzida pela próstata. Pode subir com o aumento benigno da próstata, inflamações e câncer."], ["CK", "CPK", "creatinofosfoquinase|ck total|creatinoquinase", "Músculos", "Enzima dos músculos. Sobe após exercício intenso ou lesão muscular."], ["TROPO", "Troponina", "troponina i|troponina t|troponina ultrassensivel", "Coração", "Proteína do músculo cardíaco. Elevada pode indicar lesão do coração e exige avaliação médica imediata."], ["INR", "RNI (INR)", "rni|inr|tempo de protrombina inr", "Coagulação", "Mede o tempo de coagulação do sangue de forma padronizada. Usado em quem toma varfarina."]];
+const CRITICOS_RAW = [["K", "mmol l", "2.8", "6.2", "Potássio em nível que pode afetar o ritmo do coração."], ["NA", "mmol l", "120", "160", "Sódio em nível que pode causar confusão mental e convulsões."], ["GLI", "mg dl", "50", "400", "Glicose em nível que pode causar perda de consciência ou descompensação do diabetes."], ["HB", "g dl", "7", "20", "Hemoglobina em nível muito alterado."], ["PLT", "ul", "20000", "1000000", "Plaquetas em nível com risco de sangramento ou trombose."], ["PLT", "mil ul", "20", "1000", "Plaquetas em nível com risco de sangramento ou trombose."], ["LEU", "ul", "2000", "30000", "Leucócitos em nível que exige avaliação médica rápida."], ["LEU", "mil ul", "2", "30", "Leucócitos em nível que exige avaliação médica rápida."], ["CA", "mg dl", "6.5", "13", "Cálcio em nível que pode afetar músculos, nervos e coração."], ["MG", "mg dl", "1", "", "Magnésio muito baixo pode afetar o ritmo do coração."], ["CREA", "mg dl", "", "7", "Creatinina muito alta indica possível perda importante da função dos rins."], ["INR", "", "", "5", "RNI muito alto indica risco aumentado de sangramento."], ["BT", "mg dl", "", "15", "Bilirrubina muito alta exige avaliação médica rápida."]];
+const EXEMPLO = "Laboratório: Laboratório Exemplo de Análises Clínicas\nPaciente: Maria Aparecida Souza\nData de nascimento: 14/03/1972 | Idade: 54 anos | Sexo: F\nMédico solicitante: Dr. João Pereira\nData da coleta: 10/11/2026\n\nHEMOGRAMA COMPLETO\nHemoglobina ............: 11,2 g/dL        VR: 12,0 a 16,0 g/dL\nHematócrito ............: 34,8 %           VR: 36,0 a 46,0 %\nVCM ....................: 76,5 fL          VR: 80,0 a 100,0 fL\nLeucócitos .............: 6.800 /mm³       VR: 4.000 a 11.000 /mm³\nPlaquetas ..............: 245.000 /mm³     VR: 150.000 a 450.000 /mm³\n\nBIOQUÍMICA\nGlicose ................: 112 mg/dL        VR: 70 a 99 mg/dL\nHemoglobina glicada ....: 6,1 %            VR: Inferior a 5,7 %\nColesterol total .......: 228 mg/dL        VR: Inferior a 190 mg/dL\nColesterol HDL .........: 52 mg/dL         VR: Superior a 40 mg/dL\nColesterol LDL .........: 148 mg/dL        VR: Inferior a 130 mg/dL\nTriglicerídeos .........: 140 mg/dL        VR: Inferior a 150 mg/dL\nCreatinina .............: 0,82 mg/dL       VR: 0,50 a 1,10 mg/dL\nPotássio ...............: 4,3 mEq/L        VR: 3,5 a 5,1 mEq/L\nTSH ....................: 3,10 µUI/mL      VR: 0,45 a 4,50 µUI/mL\nFerritina ..............: 9 ng/mL          VR: 15 a 150 ng/mL\n\nLiberado eletronicamente em 11/11/2026.\n";
+const PROMPT_LEITURA = "Você transcreve laudos de exames (resultados) emitidos por laboratórios e clínicas no\nBrasil para um formulário estruturado. O paciente vai conferir a transcrição antes de qualquer\ninterpretação, então a fidelidade ao documento é o que importa.\n\nRegras:\n- Transcreva apenas o que está no documento. Nunca invente nem corrija valores. Campo ausente = \"\".\n- Datas no formato DD/MM/AAAA. Sexo: \"M\", \"F\" ou \"\".\n- \"tipo\": \"laboratorial\" para exames com valores (sangue, urina, fezes, hormônios...); \"imagem\" para\n  ultrassom, raio-X, tomografia, ressonância, mamografia, densitometria, ecocardiograma etc.;\n  \"outro\" para os demais laudos descritivos (anatomopatológico, eletrocardiograma...).\n- \"resultados\": um item por valor medido. Em painéis (hemograma, lipidograma, urina tipo I), cada\n  parâmetro é um item, com \"exame\" = nome do painel e \"analito\" = nome do parâmetro. No leucograma,\n  use os valores absolutos (/mm³ ou /µL) e coloque o percentual em \"observacao\".\n- \"valor\": exatamente como impresso, mantendo vírgula decimal e sinais (ex.: \"13,5\", \"< 0,5\",\n  \"Negativo\", \"250.000\"). \"unidade\" como impressa.\n- \"referencia\": o texto completo dos valores de referência daquele item, como impresso.\n- \"ref_min\" / \"ref_max\": os limites numéricos da faixa que se aplica A ESTE paciente (considere\n  sexo, idade e fase quando o laudo trouxer várias faixas). Use null para o limite que não existir\n  (ex.: \"< 200\" -> ref_min null, ref_max 200) e null em ambos quando não houver faixa numérica ou\n  quando não der para saber qual faixa se aplica. Para lipídios com metas por risco, use a faixa\n  \"desejável\"/\"ótimo\" para adultos sem outra indicação.\n- Laudos descritivos: preencha \"titulo_exame\", \"achados\" (texto do laudo, resumido sem perder\n  informação) e \"conclusao\" (impressão diagnóstica/conclusão, como escrita). Deixe \"resultados\" vazio,\n  salvo medidas numéricas com referência (ex.: densitometria T-score).\n- \"campos_incertos\": caminhos dos campos lidos com dúvida (ex.: \"resultados[3].valor\").\n- \"alertas_leitura\": problemas que o paciente deve conferir: página cortada, foto ilegível em algum\n  trecho, mais de um paciente, documento que não é laudo (ex.: pedido médico, receita) etc.\n";
+const PROMPT_INTERP = "Você ajuda pacientes brasileiros a entender o laudo dos próprios exames. O texto será lido\npelo paciente, não por um profissional de saúde. Seu papel é educativo: explicar, contextualizar e\npreparar o paciente para conversar com o médico. Você não diagnostica, não prescreve e não substitui\na consulta.\n\nEscreva em português do Brasil, em linguagem simples (como para alguém sem formação em saúde),\nfrases curtas, tom calmo e respeitoso. Evite jargão; quando um termo técnico for necessário,\nexplique-o. Não use alarmismo nem falsa tranquilidade.\n\nVocê recebe o laudo já transcrito e conferido pelo paciente, em JSON. Para cada resultado, o campo\n\"situacao\" foi calculado pelo sistema comparando o valor com a referência do próprio laudo:\n\"normal\", \"alto\", \"baixo\", \"alterado\" (qualitativo fora do esperado) ou \"sem_referencia\".\nRespeite essa classificação: não a contradiga. Quando houver \"historico\", são valores anteriores do\nmesmo exame deste paciente (de outros laudos); comente a evolução quando for relevante.\n\nRegras de conteúdo:\n- Nunca afirme que o paciente tem uma doença. Use \"pode estar relacionado a\", \"costuma ser\n  investigado\", \"o médico pode avaliar se...\".\n- Considere os resultados em conjunto (ex.: hemoglobina baixa + VCM baixo + ferritina baixa sugerem\n  investigar falta de ferro; glicose e hemoglobina glicada juntas).\n- Nunca indique medicamentos, doses, suplementos específicos ou mudanças de tratamento.\n- \"exames_para_conversar\": exames complementares que um médico costuma considerar diante destes\n  resultados, com o motivo em uma frase. Apresente como algo para conversar com o médico, nunca\n  como ordem. Lista vazia se nada fizer sentido. No máximo 5.\n- \"perguntas_medico\": 3 a 6 perguntas objetivas que o paciente pode levar à consulta.\n- \"habitos\": orientações gerais e seguras de estilo de vida ligadas aos achados (alimentação,\n  atividade física, sono, álcool, hidratação). Lista vazia se não houver nada pertinente.\n- \"procurar_atendimento\": sinais ou situações deste laudo que pedem procurar atendimento médico\n  rapidamente ou pronto-socorro (ex.: resultados com \"critico\": true, troponina positiva, achado de\n  imagem descrito como urgente). Diga o que fazer de forma clara. Lista vazia se não houver.\n- \"acompanhamento\": em 1 a 3 frases, como esses exames costumam ser acompanhados (ex.: repetir após\n  tratamento, a critério do médico). Não defina prazos rígidos.\n- \"itens\": um item para cada resultado alterado (\"alto\", \"baixo\", \"alterado\") e para os normais que\n  ajudem a entender o conjunto; \"indice\" é a posição do resultado na lista \"resultados\" (começando\n  em 0). Em laudos descritivos (imagem e outros), faça itens com indice -1 explicando os achados e\n  a conclusão, termo a termo. \"o_que_e\": o que o exame mede (1 a 2 frases). \"seu_resultado\": o que\n  o valor significa em relação à referência (1 a 3 frases). \"possiveis_causas\": causas comuns,\n  incluindo as que não são doença (jejum, exercício, hidratação, medicamentos, ciclo menstrual);\n  vazia para resultados normais.\n- \"resumo\": 3 a 6 frases com a visão geral do laudo: o que está dentro do esperado, o que chama\n  atenção e o próximo passo (conversar com o médico).\n- Se o laudo não parecer um laudo de exame, diga isso no resumo e deixe as listas vazias.\n";
+
+const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem("seulaudo." + k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("seulaudo." + k, JSON.stringify(v)); return true; } catch { return false; } },
+  del(k) { try { localStorage.removeItem("seulaudo." + k); } catch {} }
+};
+function toast(m, ms = 3500) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, ms); }
+
+/* ---------------- valores (mesmas regras de app/valores.py) ---------------- */
+const NUM = "[-+]?\\d+(?:[.,]\\d+)*";
+const semAcento = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "");
+const normalizar = s => semAcento(s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+function numero(t) {
+  const m = String(t ?? "").match(new RegExp(NUM)); if (!m) return null;
+  let s = m[0].replace(/^\+/, "");
+  if (s.includes(",") && s.includes(".")) s = s.replace(/\./g, "").replace(",", ".");
+  else if (s.includes(",")) s = s.split(",").length === 2 ? s.replace(",", ".") : s.replace(/,/g, "");
+  else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, "");
+  else if (s.includes(".")) { const [i, d] = s.split("."); if (d.length === 3 && !/^-?0$/.test(i)) s = i + d; }
+  const v = parseFloat(s); return isNaN(v) ? null : v;
+}
+const MENOR = /(<=?|≤|menor\s+(ou\s+igual\s+)?(que|a|do\s+que)|inferior\s+a|\bate\b|abaixo\s+de)/;
+const MAIOR = /(>=?|≥|maior\s+(ou\s+igual\s+)?(que|a|do\s+que)|superior\s+a|acima\s+de)/;
+function faixa(ref) {
+  if (!ref) return [null, null];
+  const t = semAcento(ref).toLowerCase().replace(/[–—]/g, "-").replace(/\s+/g, " ").trim();
+  const nums = t.match(new RegExp(NUM, "g")) || [];
+  const m = t.match(new RegExp(`(${NUM})\\s*(?:a|-|ate|e)\\s*(${NUM})`));
+  if (m && nums.length === 2) { const a = numero(m[1]), b = numero(m[2]); if (a !== null && b !== null && a <= b) return [a, b]; }
+  if (nums.length === 1) { if (MENOR.test(t)) return [null, numero(nums[0])]; if (MAIOR.test(t)) return [numero(nums[0]), null]; }
+  return [null, null];
+}
+const NEG = new Set(["negativo", "nao reagente", "ausente", "ausentes", "nao detectado", "nao detectavel", "indetectavel", "normal", "nao reativo"]);
+const POS = new Set(["positivo", "reagente", "presente", "presentes", "detectado", "detectavel", "reativo"]);
+function classificar(r) {
+  r.valor_numerico = /\d/.test(r.valor || "") ? numero(r.valor) : null;
+  if (r.referencia) { const [mn, mx] = faixa(r.referencia); if (mn !== null || mx !== null) { r.ref_min = mn; r.ref_max = mx; } }
+  const v = r.valor_numerico, mn = r.ref_min ?? null, mx = r.ref_max ?? null;
+  if (v !== null && (mn !== null || mx !== null)) {
+    r.situacao = mn !== null && v < mn ? "baixo" : mx !== null && (v > mx || (v === mx && semAcento(r.valor).trim().startsWith(">"))) ? "alto" : "normal";
+    return r;
+  }
+  const val = normalizar(r.valor), ref = normalizar(r.referencia);
+  if (val && ref && (val === ref || ref.split(" ou ").includes(val))) r.situacao = "normal";
+  else if (POS.has(val) && (NEG.has(ref) || !ref)) r.situacao = "alterado";
+  else if (NEG.has(val) && (NEG.has(ref) || !ref)) r.situacao = "normal";
+  else r.situacao = "sem_referencia";
+  return r;
+}
+const UN_EQ = { "meq l": "mmol l", "mm3": "ul", "mcl": "ul", "mil mm3": "mil ul", "mil mcl": "mil ul", "milhoes mm3": "milhoes ul", "milhoes mcl": "milhoes ul", "mui ml": "uui ml", "miu l": "uui ml" };
+function unidade(u) {
+  let t = String(u || "").replace(/³/g, "3").replace(/[µμ]/g, "u");
+  t = t.replace(/x?\s*10\s*\^?\s*3(?!\d)/gi, " mil ").replace(/x?\s*10\s*\^?\s*6(?!\d)/gi, " milhoes ");
+  t = normalizar(t); return UN_EQ[t] || t;
+}
+
+/* ---------------- catálogo de analitos e valores críticos ---------------- */
+const ANALITOS = ANALITOS_RAW.map(([codigo, nome, sin, categoria, descricao]) => ({ codigo, nome, sin: sin.split("|").filter(Boolean), categoria, descricao }));
+const POR_COD = Object.fromEntries(ANALITOS.map(a => [a.codigo, a]));
+const INDICE = new Map();
+for (const a of ANALITOS) for (const n of [a.nome, a.codigo, ...a.sin]) { const k = normalizar(n); if (k && !INDICE.has(k)) INDICE.set(k, a.codigo); }
+const CRITICOS = CRITICOS_RAW.map(([codigo, un, mn, mx, msg]) => ({ codigo, un: un.split("|").filter(Boolean), mn: mn === "" ? null : +mn, mx: mx === "" ? null : +mx, msg }));
+function ratio(a, b) { // semelhança de texto 0–100 (como rapidfuzz.fuzz.ratio)
+  const m = a.length, n = b.length; if (!m || !n) return 0;
+  let prev = new Array(n + 1).fill(0);
+  for (let i = 1; i <= m; i++) { const cur = [0]; for (let j = 1; j <= n; j++) cur[j] = a[i - 1] === b[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], cur[j - 1]); prev = cur; }
+  return 200 * prev[n] / (m + n);
+}
+function identificar(nome) {
+  const k = normalizar(nome); if (!k) return null;
+  if (INDICE.has(k)) return POR_COD[INDICE.get(k)];
+  let melhor = null, s = 0;
+  for (const [n, c] of INDICE) { const r = ratio(k, n); if (r > s) { s = r; melhor = c; } }
+  return s >= 90 ? POR_COD[melhor] : null;
+}
+function padronizar(r) {
+  const a = identificar(r.analito) || (!r.analito ? identificar(r.exame) : null);
+  r.codigo = a?.codigo || ""; r.nome_padrao = a?.nome || "";
+  r.critico = false; r.mensagem_critica = "";
+  if (r.codigo && r.valor_numerico !== null) {
+    const u = unidade(r.unidade);
+    for (const c of CRITICOS) {
+      if (c.codigo !== r.codigo || (c.un.length && !c.un.includes(u))) continue;
+      if ((c.mn !== null && r.valor_numerico < c.mn) || (c.mx !== null && r.valor_numerico > c.mx)) { r.critico = true; r.mensagem_critica = c.msg; break; }
+    }
+  }
+  return r;
+}
+const processar = d => { (d.resultados || []).forEach(r => padronizar(classificar(r))); return d; };
+
+/* ---------------- leitura por regras (como app/extratores/texto.py) ---------------- */
+const QUAL = "negativo|positivo|n[aã]o reagente|reagente|ausentes?|presentes?|n[aã]o detectado|detectado";
+const REF = "(?:v\\.?\\s?r\\.?|ref\\.?|refer[eê]ncia|valor(?:es)? de refer[eê]ncia)";
+const LINHA = new RegExp(`^\\s*([A-Za-zÀ-ú][A-Za-zÀ-ú0-9 ()/\\-,]*?)\\s*(?:\\.{2,}|:)[\\s.:]*([<>≤≥]?\\s*\\d[\\d.,]*|${QUAL})\\s*([^\\s\\d:][^\\s]*)?\\s*(?:${REF}\\s*:?\\s*(.+?))?\\s*$`, "i");
+const IGNORAR = /^(paciente|nome|nascimento|data|idade|sexo|coleta|laborat|m[eé]dico|solicitante|material|m[eé]todo|liberado|assinado|p[aá]gina)/i;
+const vazio = () => ({ tipo: "laboratorial", paciente: { nome: "", data_nascimento: "", idade: "", sexo: "" }, laboratorio: "", data_coleta: "", medico_solicitante: "", resultados: [], titulo_exame: "", achados: "", conclusao: "", legibilidade: "", campos_incertos: [], alertas_leitura: [] });
+function lerTexto(texto) {
+  const d = vazio(), pega = (re) => (texto.match(re) || [])[1]?.trim() || "";
+  d.paciente.nome = pega(/^\s*(?:paciente|nome)\s*:\s*(.+?)\s*$/im);
+  d.paciente.data_nascimento = pega(/(?:data de )?nascimento\s*:\s*(\d{2}\/\d{2}\/\d{4})/i);
+  d.paciente.idade = pega(/idade\s*:\s*([^\n|]+?)\s*(?:\||$)/im);
+  d.paciente.sexo = pega(/sexo\s*:\s*([MF])/i).toUpperCase();
+  d.data_coleta = pega(/(?:data (?:da )?coleta|coletado em|coleta)\s*:\s*(\d{2}\/\d{2}\/\d{4})/i);
+  d.laboratorio = pega(/^\s*laborat[oó]rio\s*:\s*(.+?)\s*$/im);
+  let secao = "";
+  for (const l of texto.split(/\r?\n/)) {
+    const s = l.trim(); if (!s) continue;
+    const m = l.match(LINHA);
+    if (m && !IGNORAR.test(s)) {
+      let un = (m[3] || "").trim(); if (new RegExp(`^${REF}$`, "i").test(un)) un = "";
+      d.resultados.push({ exame: secao || m[1].trim(), analito: m[1].trim(), valor: m[2].replace(/\s+/g, " ").trim(), unidade: un, referencia: (m[4] || "").trim(), ref_min: null, ref_max: null, material: "", metodo: "", observacao: "" });
+    } else if (s === s.toUpperCase() && /[A-Z]/.test(s) && s.length > 3 && !s.includes(":")) secao = s.charAt(0) + s.slice(1).toLowerCase();
+  }
+  if (!d.resultados.length) d.alertas_leitura.push("Nenhum resultado reconhecido pelas regras. Tente a leitura com Claude.");
+  d.legibilidade = "boa";
+  return d;
+}
+
+/* ---------------- Claude ---------------- */
+let sample = null, limites = null, claudeChecado = false;
+(async () => {
+  try { sample = await window.claude?.use("sample"); } catch { sample = null; }
+  if (sample) limites = await sample.limits().catch(() => null);
+  claudeChecado = true; avisoClaude();
+})();
+setTimeout(() => { claudeChecado = true; avisoClaude(); }, 11000);
+function avisoClaude() {
+  const el = $("#avisoClaude"), modo = $("input[name=modo]:checked").value;
+  let m = "";
+  if (modo === "claude") {
+    if (!window.claude) m = "Abra esta página no claude.ai para usar a leitura com Claude.";
+    else if (claudeChecado && !sample) m = "A leitura com Claude não está disponível nesta visualização. Use a leitura por regras.";
+    else if (sample && limites && !limites.images) m = "Envio de imagens ao Claude indisponível aqui: só texto colado ou PDF digital.";
+  }
+  el.innerHTML = m ? `<div class="aviso">${esc(m)}</div>` : "";
+}
+const ERROS = {
+  not_granted: "Uso do Claude não autorizado nesta página.", sampling_disabled: "Claude indisponível para esta conta.",
+  rate_limited: "Limite de uso atingido. Tente de novo em alguns minutos.", image_rejected: "Imagem recusada: use JPG, PNG ou WEBP.",
+  images_unavailable: "Envio de imagens indisponível nesta visualização.", refused: "O Claude recusou processar este documento.",
+  invalid_json: "A resposta veio fora do formato. Tente de novo.", session_expired: "Sessão expirada: entre de novo no claude.ai.",
+  empty_completion: "Resposta vazia. Tente de novo.", prompt_too_large: "Documento grande demais."
+};
+const msgErro = e => e?.code ? (ERROS[e.code] || "Falha ao falar com o Claude. Tente de novo.") : (e?.message || String(e));
+const FORMATO_LEITURA = `{"tipo":"laboratorial","paciente":{"nome":"","data_nascimento":"","idade":"","sexo":""},"laboratorio":"","data_coleta":"","medico_solicitante":"","resultados":[{"exame":"","analito":"","valor":"","unidade":"","referencia":"","ref_min":null,"ref_max":null,"material":"","metodo":"","observacao":""}],"titulo_exame":"","achados":"","conclusao":"","legibilidade":"boa","campos_incertos":[],"alertas_leitura":[]}`;
+const FORMATO_INTERP = `{"resumo":"","itens":[{"indice":0,"titulo":"","o_que_e":"","seu_resultado":"","possiveis_causas":[]}],"perguntas_medico":[],"exames_para_conversar":[{"exame":"","motivo":""}],"habitos":[],"procurar_atendimento":[],"acompanhamento":""}`;
+function completarLeitura(x) {
+  const d = vazio(), S = v => String(v ?? ""), N = v => (typeof v === "number" && isFinite(v) ? v : null);
+  d.tipo = ["laboratorial", "imagem", "outro"].includes(x?.tipo) ? x.tipo : "laboratorial";
+  for (const k in d.paciente) d.paciente[k] = S(x?.paciente?.[k]);
+  for (const k of ["laboratorio", "data_coleta", "medico_solicitante", "titulo_exame", "achados", "conclusao", "legibilidade"]) d[k] = S(x?.[k]);
+  d.resultados = (Array.isArray(x?.resultados) ? x.resultados : []).map(r => ({ exame: S(r.exame), analito: S(r.analito), valor: S(r.valor), unidade: S(r.unidade), referencia: S(r.referencia), ref_min: N(r.ref_min), ref_max: N(r.ref_max), material: S(r.material), metodo: S(r.metodo), observacao: S(r.observacao) })).filter(r => r.analito || r.valor);
+  d.campos_incertos = (x?.campos_incertos || []).map(String); d.alertas_leitura = (x?.alertas_leitura || []).map(String);
+  return d;
+}
+
+/* ---------------- PDF e imagens ---------------- */
+async function pdfDoc(buf) { if (!window.pdfjsLib) throw new Error("O leitor de PDF não carregou. Envie uma foto do laudo."); return pdfjsLib.getDocument({ data: buf }).promise; }
+async function pdfImagens(buf, max) {
+  const doc = await pdfDoc(buf), blobs = [], urls = [];
+  for (let i = 1; i <= Math.min(doc.numPages, max); i++) {
+    const pg = await doc.getPage(i), vp = pg.getViewport({ scale: 2 }), c = document.createElement("canvas");
+    c.width = vp.width; c.height = vp.height; await pg.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+    blobs.push(await new Promise(r => c.toBlob(r, "image/jpeg", 0.9))); urls.push(c.toDataURL("image/jpeg", 0.8));
+  }
+  return { blobs, urls, paginas: doc.numPages };
+}
+async function pdfTexto(buf) {
+  const doc = await pdfDoc(buf); let t = "";
+  for (let i = 1; i <= doc.numPages; i++) {
+    const c = await (await doc.getPage(i)).getTextContent(); let y = null;
+    for (const it of c.items) { t += y !== null && Math.abs(it.transform[5] - y) > 2 ? "\n" : y !== null ? " " : ""; t += it.str; y = it.transform[5]; }
+    t += "\n";
+  }
+  return t;
+}
+const lerDataURL = f => new Promise((ok, err) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = err; r.readAsDataURL(f); });
+
+/* ---------------- estado ---------------- */
+let LAUDOS = store.get("laudos", []), atual = null, previas = {};
+const salvar = () => { if (!store.set("laudos", LAUDOS)) toast("Não foi possível guardar neste navegador; os dados valem só até fechar a página.", 6000); };
+const proxId = () => LAUDOS.reduce((m, l) => Math.max(m, l.id), 0) + 1;
+const perfil = () => store.get("perfil", null);
+
+function mostrar(v) {
+  if (!perfil()?.aceite) v = "inicio";
+  $$("main > section").forEach(s => s.hidden = s.id !== "v-" + v);
+  $$("nav button").forEach(b => b.classList.toggle("ativo", b.dataset.v === v));
+  window.scrollTo(0, 0);
+  if (v === "laudos") desenharLista();
+  if (v === "evolucao") desenharEvolucao();
+}
+$$("nav button").forEach(b => b.addEventListener("click", () => mostrar(b.dataset.v)));
+$$("[data-ir]").forEach(b => b.addEventListener("click", () => mostrar(b.dataset.ir)));
+$("#bComecar").addEventListener("click", () => {
+  if (!$("#pAceite").checked) return toast("Para continuar, aceite o termo de uso dos dados.");
+  store.set("perfil", { aceite: new Date().toISOString(), nasc: $("#pNasc").value.trim(), sexo: $("#pSexo").value });
+  mostrar("enviar");
+});
+
+/* ---------------- envio ---------------- */
+let arquivo = null, miniURL = null, ctl = null;
+function selecionar(f) {
+  arquivo = f || null;
+  $("#nomeArq").textContent = f ? `${f.name || "imagem colada"} · ${Math.max(1, Math.round(f.size / 1024))} KB` : "";
+  if (miniURL) URL.revokeObjectURL(miniURL);
+  miniURL = f && f.type.startsWith("image/") ? URL.createObjectURL(f) : null;
+  $("#mini").hidden = !miniURL; if (miniURL) $("#mini").src = miniURL;
+}
+for (const id of ["#arq", "#cam"]) $(id).addEventListener("change", e => { selecionar(e.target.files[0]); e.target.value = ""; });
+const drop = $("#drop");
+["dragenter", "dragover"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add("on"); }));
+["dragleave", "drop"].forEach(e => drop.addEventListener(e, () => drop.classList.remove("on")));
+drop.addEventListener("drop", ev => { ev.preventDefault(); selecionar(ev.dataTransfer.files[0]); });
+document.addEventListener("paste", ev => {
+  if ($("#v-enviar").hidden || ev.target.id === "txt") return;
+  const it = [...(ev.clipboardData?.items || [])].find(i => i.kind === "file" && i.type.startsWith("image/"));
+  if (it) { ev.preventDefault(); const f = it.getAsFile(); selecionar(new File([f], "imagem-colada.png", { type: f.type })); }
+});
+$$("input[name=modo]").forEach(r => r.addEventListener("change", avisoClaude));
+$("#bEx").addEventListener("click", () => { $("#txt").value = EXEMPLO; selecionar(null); $("input[name=modo][value=regras]").checked = true; avisoClaude(); });
+$("#bParar").addEventListener("click", () => ctl?.abort());
+
+$("#fEnv").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const modo = $("input[name=modo]:checked").value, f = arquivo, texto = $("#txt").value.trim(), msg = $("#msgEnv");
+  msg.innerHTML = "";
+  if (!f && !texto) { msg.innerHTML = `<div class="aviso erro">Escolha um arquivo, tire uma foto ou cole o texto do laudo.</div>`; return; }
+  const l = { id: proxId(), criado: new Date().toISOString(), arquivo: f ? (f.name || "imagem") : "texto colado", modo, status: "lido" };
+  let previa = null;
+  $("#bLer").disabled = true; $("#lendo").innerHTML = `<span class="spin"></span>Lendo o laudo… pode levar até um minuto.`;
+  try {
+    let d;
+    if (modo === "regras") {
+      let t = texto;
+      if (f) {
+        if (f.type === "application/pdf") t = await pdfTexto(await f.arrayBuffer());
+        else if (f.type.startsWith("text/")) t = await f.text();
+        else throw new Error("A leitura por regras só lê texto e PDF digital. Para fotos, use a leitura com Claude.");
+        if (t.trim().length < 20) throw new Error("O PDF não tem texto (é digitalizado). Use a leitura com Claude.");
+      }
+      previa = { tipo: "texto", t }; d = lerTexto(t);
+    } else {
+      if (!sample) throw new Error(window.claude ? "Leitura com Claude indisponível nesta visualização." : "Abra esta página no claude.ai para usar a leitura com Claude.");
+      let imgs = null, extra = "";
+      if (f && (f.type === "application/pdf" || f.type.startsWith("image/"))) {
+        if (!limites?.images) {
+          if (f.type !== "application/pdf") throw new Error("Envio de imagens ao Claude indisponível aqui. Cole o texto do laudo.");
+          const t = await pdfTexto(await f.arrayBuffer());
+          if (t.trim().length < 20) throw new Error("Este PDF é digitalizado e o envio de imagens está indisponível aqui.");
+          previa = { tipo: "texto", t }; extra = `\n\nTexto extraído do PDF do laudo:\n${t.slice(0, 40000)}`;
+        } else if (f.type === "application/pdf") {
+          const buf = await f.arrayBuffer(), p = await pdfImagens(buf.slice(0), limites.images.maxCount || 5);
+          imgs = p.blobs; previa = { tipo: "img", urls: p.urls };
+          extra = `\n\nAs imagens são as páginas de um PDF${p.paginas > imgs.length ? ` (${imgs.length} de ${p.paginas} páginas; avise em alertas_leitura que nem todas as páginas foram lidas)` : ""}.`;
+          const t = await pdfTexto(buf.slice(0)).catch(() => "");
+          if (t.trim().length > 100) extra += `\n\nTexto extraído do PDF, para ajudar a conferir números (a imagem prevalece em caso de dúvida):\n${t.slice(0, 30000)}`;
+        } else { imgs = [f]; previa = { tipo: "img", urls: [await lerDataURL(f)] }; }
+      } else if (f && f.type.startsWith("text/")) { const t = await f.text(); previa = { tipo: "texto", t }; extra = `\n\nConteúdo do laudo:\n${t.slice(0, 40000)}`; }
+      else if (f) throw new Error("Formato não suportado. Envie PDF, JPG, PNG ou WEBP.");
+      else { previa = { tipo: "texto", t: texto }; extra = `\n\nConteúdo do laudo:\n${texto.slice(0, 40000)}`; }
+      ctl = new AbortController(); $("#bParar").hidden = false;
+      const x = await sample.json(`${PROMPT_LEITURA}\nResponda apenas com um objeto JSON neste formato:\n${FORMATO_LEITURA}${extra}`, { images: imgs || undefined, signal: ctl.signal, modelTier: "complex" });
+      d = completarLeitura(x);
+    }
+    const p = perfil() || {};
+    d.paciente.sexo ||= p.sexo || ""; d.paciente.data_nascimento ||= p.nasc || "";
+    l.dados = processar(d);
+  } catch (e) {
+    if (e?.code === "cancelled" || e?.name === "AbortError") { msg.innerHTML = `<div class="aviso">Leitura interrompida.</div>`; return; }
+    msg.innerHTML = `<div class="aviso erro">${esc(msgErro(e))}</div>`; return;
+  } finally { $("#bLer").disabled = false; $("#lendo").textContent = ""; $("#bParar").hidden = true; ctl = null; }
+  previas[l.id] = previa;
+  LAUDOS.unshift(l); salvar();
+  $("#fEnv").reset(); $("#txt").value = ""; selecionar(null); avisoClaude();
+  atual = l; mostrarConferencia();
+});
+
+/* ---------------- conferência ---------------- */
+const SELO = { normal: "✓ Dentro da referência", alto: "▲ Acima da referência", baixo: "▼ Abaixo da referência", alterado: "! Diferente do esperado", sem_referencia: "– Sem referência" };
+const CURTO = { normal: "✓ Normal", alto: "▲ Alto", baixo: "▼ Baixo", alterado: "! Alterado", sem_referencia: "– Sem ref." };
+const selo = (r, curto) => r.critico ? `<span class="selo critico">! ${curto ? "Crítico" : "Valor crítico"}</span>` : r.situacao ? `<span class="selo ${r.situacao}">${(curto ? CURTO : SELO)[r.situacao]}</span>` : "";
+const getP = (o, p) => p.split(".").reduce((a, k) => a?.[k], o);
+const setP = (o, p, v) => { const ks = p.split("."), u = ks.pop(); ks.reduce((a, k) => a[k] ??= {}, o)[u] = v; };
+
+function mostrarConferencia() {
+  const d = atual.dados, inc = new Set(d.campos_incertos || []), pv = previas[atual.id];
+  $("#docPrev").innerHTML = !pv ? `<p class="sub" style="padding:12px">A imagem do documento não fica guardada depois que a página é fechada. Confira com o laudo original.</p>`
+    : pv.tipo === "img" ? pv.urls.map((u, i) => `<img src="${u}" alt="Página ${i + 1} do laudo">`).join("") : `<pre>${esc(pv.t)}</pre>`;
+  $$("#docPrev img").forEach(i => i.addEventListener("click", () => i.classList.toggle("zoom")));
+  $$("#fConf [data-c]").forEach(el => { el.value = getP(d, el.dataset.c) ?? ""; el.classList.toggle("incerto", inc.has(el.dataset.c)); });
+  const al = [...(d.alertas_leitura || [])];
+  if (d.legibilidade === "ruim") al.unshift("A imagem estava difícil de ler. Confira cada valor ou envie uma foto melhor.");
+  $("#alertasLeitura").innerHTML = al.length ? `<div class="aviso"><strong>Confira:</strong><ul>${al.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>` : "";
+  desenharTabela(d.resultados, inc);
+  $("#blocoDesc").hidden = d.tipo === "laboratorial" && !d.conclusao && !d.achados;
+  $("#msgConf").innerHTML = "";
+  mostrar("conferir");
+}
+function desenharTabela(res, inc = new Set()) {
+  const c = (i, k) => inc.has(`resultados[${i}].${k}`) || inc.has(`resultados[${i}]`) ? "incerto" : "";
+  $("#tabRes tbody").innerHTML = res.map((r, i) => `<tr data-i="${i}">
+    <td><input data-r="analito" value="${esc(r.analito)}" class="${c(i, "analito")}" aria-label="Exame"><small>${esc(r.exame && r.exame !== r.analito ? r.exame : "")}${r.nome_padrao && normalizar(r.nome_padrao) !== normalizar(r.analito) ? ` → ${esc(r.nome_padrao)}` : ""}</small></td>
+    <td><input data-r="valor" value="${esc(r.valor)}" class="${c(i, "valor")}" aria-label="Resultado"></td>
+    <td><input data-r="unidade" value="${esc(r.unidade)}" class="${c(i, "unidade")}" aria-label="Unidade"></td>
+    <td><input data-r="referencia" value="${esc(r.referencia)}" class="${c(i, "referencia")}" aria-label="Referência"></td>
+    <td>${selo(r, true)}</td><td><button type="button" class="mini" data-rm aria-label="Remover linha">✕</button></td></tr>`).join("")
+    || `<tr><td colspan="6" class="sub">Nenhum resultado numérico. Em laudos de imagem, confira o texto abaixo.</td></tr>`;
+  $$("[data-rm]").forEach(b => b.addEventListener("click", () => { const d = coletar(); d.resultados.splice(+b.closest("tr").dataset.i, 1); atual.dados = processar(d); desenharTabela(d.resultados); }));
+  $$("#tabRes input").forEach(i => i.addEventListener("change", () => { const d = coletar(); atual.dados = processar(d); desenharTabela(d.resultados); }));
+}
+function coletar() {
+  const d = structuredClone(atual.dados);
+  $$("#fConf [data-c]").forEach(el => setP(d, el.dataset.c, el.value.trim()));
+  d.resultados = $$("#tabRes tbody tr[data-i]").map(tr => {
+    const o = d.resultados[+tr.dataset.i] || {}, r = { ...o };
+    $$("[data-r]", tr).forEach(el => r[el.dataset.r] = el.value.trim());
+    if (r.referencia !== o.referencia) { r.ref_min = null; r.ref_max = null; }
+    return r;
+  }).filter(r => r.analito || r.valor);
+  d.campos_incertos = [];
+  return d;
+}
+$("#bAdd").addEventListener("click", () => { const d = coletar(); d.resultados.push({ exame: "", analito: "", valor: "", unidade: "", referencia: "", ref_min: null, ref_max: null }); atual.dados = d; desenharTabela(d.resultados); $("#tabRes tbody tr:last-child input").focus(); });
+$("#fConf [data-c=tipo]").addEventListener("change", e => $("#blocoDesc").hidden = e.target.value === "laboratorial");
+
+/* ---------------- interpretação ---------------- */
+const BASICO = {
+  normal: "Seu resultado está dentro da faixa de referência informada pelo laboratório.",
+  alto: "Seu resultado está acima da faixa de referência informada pelo laboratório.",
+  baixo: "Seu resultado está abaixo da faixa de referência informada pelo laboratório.",
+  alterado: "Seu resultado está diferente do esperado pela referência do laboratório.",
+  sem_referencia: "O laudo não traz uma faixa de referência que permita comparar este valor automaticamente."
+};
+const dataISO = br => { const m = String(br || "").match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? `${m[3]}-${m[2]}-${m[1]}` : ""; };
+function historicoAnterior(l) {
+  const ref = dataISO(l.dados.data_coleta), out = {};
+  for (const o of [...LAUDOS].reverse()) {
+    if (o.id === l.id || !["conferido", "interpretado"].includes(o.status)) continue;
+    const d = dataISO(o.dados.data_coleta); if (ref && d && d >= ref) continue;
+    for (const r of o.dados.resultados) if (r.codigo) (out[r.codigo] ||= []).push({ data: o.dados.data_coleta || "data não informada", valor: r.valor, unidade: r.unidade, situacao: r.situacao });
+  }
+  return out;
+}
+function interpBasica(d, hist) {
+  const fora = d.resultados.filter(r => ["alto", "baixo", "alterado"].includes(r.situacao)).map(r => r.analito || r.nome_padrao);
+  const itens = d.resultados.map((r, i) => {
+    let s = BASICO[r.situacao] || ""; const ant = hist[r.codigo];
+    if (ant?.length) { const u = ant[ant.length - 1]; s += ` No exame anterior (${u.data}) o valor foi ${u.valor} ${u.unidade}.`; }
+    return { indice: i, titulo: r.nome_padrao || r.analito, o_que_e: POR_COD[r.codigo]?.descricao || "", seu_resultado: s, possiveis_causas: [] };
+  });
+  if (d.tipo !== "laboratorial" && d.conclusao) itens.push({ indice: -1, titulo: d.titulo_exame || "Conclusão do laudo", o_que_e: "", seu_resultado: d.conclusao, possiveis_causas: [] });
+  const n = d.resultados.length;
+  return {
+    modo: "basico",
+    resumo: (fora.length ? `De ${n} resultados, ${fora.length} ficaram fora da faixa de referência do laboratório: ${fora.join(", ")}. Isso não significa necessariamente uma doença, mas vale conversar com seu médico sobre eles.`
+      : n ? `Os ${n} resultados deste laudo estão dentro das faixas de referência do laboratório.` : "Não há resultados numéricos neste laudo para comparar automaticamente.") + " (Explicação básica, sem IA.)",
+    itens, perguntas_medico: fora.length ? ["Algum destes resultados precisa de tratamento ou de novos exames?", "Quando devo repetir os exames que vieram fora da referência?", "Algum medicamento que uso pode ter interferido nos resultados?", "Há algo que eu possa mudar na alimentação ou nos hábitos para melhorar estes valores?"] : ["Algum medicamento que uso pode ter interferido nos resultados?"],
+    exames_para_conversar: [], habitos: [], procurar_atendimento: [],
+    acompanhamento: "A frequência de repetição dos exames depende do seu histórico e deve ser definida pelo seu médico."
+  };
+}
+async function interpretar(basico) {
+  const d = processar(coletar()); atual.dados = d;
+  const hist = historicoAnterior(atual);
+  $("#bInterp").disabled = $("#bBasico").disabled = true;
+  $("#interpretando").innerHTML = basico ? "" : `<span class="spin"></span>Preparando a explicação…`;
+  $("#msgConf").innerHTML = "";
+  try {
+    let it;
+    if (basico) it = interpBasica(d, hist);
+    else {
+      if (!sample) throw new Error(window.claude ? "Claude indisponível nesta visualização. Use a explicação básica." : "Abra esta página no claude.ai para a explicação com Claude.");
+      const ent = structuredClone(d); delete ent.paciente.nome; delete ent.campos_incertos; delete ent.alertas_leitura; delete ent.legibilidade;
+      for (const r of ent.resultados) { if (hist[r.codigo]) r.historico = hist[r.codigo]; delete r.valor_numerico; delete r.nome_padrao; delete r.mensagem_critica; }
+      ctl = new AbortController();
+      const x = await sample.json(`${PROMPT_INTERP}\nResponda apenas com um objeto JSON neste formato:\n${FORMATO_INTERP}\n\nLaudo conferido pelo paciente:\n${JSON.stringify(ent, null, 1)}\n\nExplique este laudo para o paciente seguindo as regras.`, { signal: ctl.signal, modelTier: "complex" });
+      const L = v => (Array.isArray(v) ? v.map(String).filter(Boolean) : []), S = v => String(v ?? "");
+      it = {
+        modo: "claude", resumo: S(x?.resumo), acompanhamento: S(x?.acompanhamento),
+        itens: (Array.isArray(x?.itens) ? x.itens : []).filter(i => Number.isInteger(i?.indice) && i.indice >= -1 && i.indice < d.resultados.length)
+          .map(i => ({ indice: i.indice, titulo: S(i.titulo), o_que_e: S(i.o_que_e), seu_resultado: S(i.seu_resultado), possiveis_causas: L(i.possiveis_causas) })),
+        perguntas_medico: L(x?.perguntas_medico), habitos: L(x?.habitos), procurar_atendimento: L(x?.procurar_atendimento),
+        exames_para_conversar: (Array.isArray(x?.exames_para_conversar) ? x.exames_para_conversar : []).map(e => ({ exame: S(e?.exame), motivo: S(e?.motivo) })).filter(e => e.exame)
+      };
+    }
+    const crit = d.resultados.filter(r => r.critico).map(r => `${r.analito || r.nome_padrao}: ${r.valor} ${r.unidade}. ${r.mensagem_critica} Procure atendimento médico o quanto antes e leve este laudo.`);
+    it.procurar_atendimento = [...crit, ...it.procurar_atendimento.filter(a => !crit.includes(a))];
+    atual.interp = it; atual.status = "interpretado"; salvar();
+    mostrarLaudo();
+  } catch (e) {
+    if (e?.code !== "cancelled") $("#msgConf").innerHTML = `<div class="aviso erro">${esc(msgErro(e))}</div>`;
+  } finally { $("#bInterp").disabled = $("#bBasico").disabled = false; $("#interpretando").textContent = ""; ctl = null; }
+}
+$("#fConf").addEventListener("submit", e => { e.preventDefault(); interpretar(false); });
+$("#bBasico").addEventListener("click", () => interpretar(true));
+
+const lista = xs => `<ul>${xs.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
+const FORA = s => ["alto", "baixo", "alterado"].includes(s);
+function cartao(item, r) {
+  const cls = r?.critico ? "critico" : r && FORA(r.situacao) ? "fora" : "";
+  return `<div class="item ${cls}"><div class="t"><strong>${esc(item.titulo || r?.analito || "")}</strong>${r ? selo(r) : ""}</div>
+    ${r ? `<div class="v"><strong>${esc(r.valor)} ${esc(r.unidade)}</strong>${r.referencia ? `<small> · referência: ${esc(r.referencia)}</small>` : ""}</div>` : ""}
+    ${item.o_que_e ? `<p><strong>O que é:</strong> ${esc(item.o_que_e)}</p>` : ""}
+    ${item.seu_resultado ? `<p><strong>Seu resultado:</strong> ${esc(item.seu_resultado)}</p>` : ""}
+    ${item.possiveis_causas?.length ? `<p><strong>Causas comuns de alteração</strong> (nem sempre são doença):</p>${lista(item.possiveis_causas)}` : ""}</div>`;
+}
+function textoResumo(l) {
+  const d = l.dados, it = l.interp, linhas = [`Resumo do laudo (${d.laboratorio || "laboratório"}${d.data_coleta ? `, coleta em ${d.data_coleta}` : ""})`, "", it.resumo, "", "Resultados fora da referência:"];
+  d.resultados.filter(r => FORA(r.situacao) || r.critico).forEach(r => linhas.push(`- ${r.analito}: ${r.valor} ${r.unidade} (referência: ${r.referencia || "não informada"})`));
+  if (it.perguntas_medico.length) linhas.push("", "Perguntas para o médico:", ...it.perguntas_medico.map(p => `- ${p}`));
+  return linhas.join("\n");
+}
+function mostrarLaudo() {
+  const l = atual, d = l.dados, it = l.interp, porI = new Map(it.itens.map(i => [i.indice, i])), alt = [], nor = [];
+  d.resultados.forEach((r, i) => (r.critico || FORA(r.situacao) ? alt : nor).push(cartao(porI.get(i) || { titulo: r.nome_padrao || r.analito }, r)));
+  const desc = it.itens.filter(i => i.indice === -1).map(i => cartao(i, null));
+  $("#relatorio").innerHTML = `
+    <div class="linha" style="justify-content:space-between;align-items:flex-start">
+      <div><h2>${esc(d.titulo_exame || "Seu laudo explicado")}</h2><p class="sub">${esc(d.laboratorio)}${d.data_coleta ? ` · coleta em ${esc(d.data_coleta)}` : ""}</p></div>
+      <div class="linha"><button class="mini" id="bEditar">Corrigir transcrição</button><button class="mini" id="bCopiarRes">Copiar resumo</button><button class="mini perigo" id="bExcluir">Excluir laudo</button></div>
+    </div>
+    ${it.procurar_atendimento.length ? `<div class="alerta-crit aviso" style="margin-top:12px"><strong>Procure atendimento médico</strong>${lista(it.procurar_atendimento)}</div>` : ""}
+    <div class="resumo">${esc(it.resumo)}</div>
+    ${desc.length ? `<h3>O que o laudo diz</h3><div class="itens">${desc.join("")}</div>` : ""}
+    ${alt.length ? `<h3>Resultados que merecem atenção (${alt.length})</h3><div class="itens">${alt.join("")}</div>` : ""}
+    ${nor.length ? `<details ${alt.length ? "" : "open"}><summary>Resultados dentro da referência ou sem referência (${nor.length})</summary><div class="itens">${nor.join("")}</div></details>` : ""}
+    ${it.perguntas_medico.length ? `<h3>Perguntas para levar ao seu médico</h3>${lista(it.perguntas_medico)}<button class="mini" id="bCopiarPerg">Copiar perguntas</button>` : ""}
+    ${it.exames_para_conversar.length ? `<h3>Exames para conversar com seu médico</h3><p class="sub pequeno">Sugestões para a conversa, não um pedido de exame. Só o médico decide o que é necessário.</p><ul>${it.exames_para_conversar.map(e => `<li><strong>${esc(e.exame)}</strong>: ${esc(e.motivo)}</li>`).join("")}</ul>` : ""}
+    ${it.habitos.length ? `<h3>Hábitos que costumam ajudar</h3>${lista(it.habitos)}` : ""}
+    ${it.acompanhamento ? `<h3>Acompanhamento</h3><p>${esc(it.acompanhamento)}</p>` : ""}
+    <p class="legal">Esta explicação é educativa e não substitui a avaliação do seu médico. Não use estas informações para iniciar, mudar ou interromper tratamentos. ${it.modo === "claude" ? "Texto gerado com IA (Claude) a partir da transcrição que você conferiu; a classificação de cada valor e os alertas de valores críticos são calculados por regras, pela referência do próprio laudo." : "Explicação básica, gerada sem IA."}</p>`;
+  $("#bEditar").addEventListener("click", mostrarConferencia);
+  const copiar = (t, m) => navigator.clipboard.writeText(t).then(() => toast(m), () => toast("Não foi possível copiar neste aplicativo."));
+  $("#bCopiarRes").addEventListener("click", () => copiar(textoResumo(l), "Resumo copiado. Cole numa mensagem ou nota para levar à consulta."));
+  $("#bCopiarPerg")?.addEventListener("click", () => copiar(it.perguntas_medico.map(p => `- ${p}`).join("\n"), "Perguntas copiadas."));
+  confirmar($("#bExcluir"), "Confirmar exclusão", () => { LAUDOS = LAUDOS.filter(x => x.id !== l.id); salvar(); toast("Laudo excluído."); mostrar("laudos"); });
+  mostrar("laudo");
+}
+function confirmar(btn, rotulo, acao) {
+  const orig = btn.textContent;
+  btn.addEventListener("click", () => {
+    if (btn.dataset.armado) return acao();
+    btn.dataset.armado = 1; btn.textContent = rotulo;
+    setTimeout(() => { delete btn.dataset.armado; btn.textContent = orig; }, 4000);
+  });
+}
+
+/* ---------------- lista ---------------- */
+function desenharLista() {
+  const el = $("#lista");
+  if (!LAUDOS.length) { el.innerHTML = `<div class="vazio">Nenhum laudo ainda. Envie o PDF ou uma foto do seu primeiro laudo.</div>`; return; }
+  el.innerHTML = LAUDOS.map(l => {
+    const d = l.dados, n = d.resultados.length, f = d.resultados.filter(r => FORA(r.situacao)).length, c = d.resultados.filter(r => r.critico).length;
+    const s = c ? `<span class="selo critico">! ${c} valor(es) crítico(s)</span>` : f ? `<span class="selo alto">${f} fora da referência</span>` : n ? `<span class="selo normal">✓ Todos dentro da referência</span>` : "";
+    return `<div class="laudo-item" data-id="${l.id}" role="button" tabindex="0"><div><strong>${esc(d.data_coleta || l.criado.slice(0, 10))} · ${esc(d.laboratorio || l.arquivo)}</strong>
+      <div class="sub pequeno">${d.tipo !== "laboratorial" ? esc(d.titulo_exame || "Laudo descritivo") : `${n} resultados`} · ${l.status === "interpretado" ? "Explicado" : "Aguardando conferência"}</div></div><div>${s}</div></div>`;
+  }).join("");
+  $$(".laudo-item", el).forEach(i => { const abrir = () => { atual = LAUDOS.find(l => l.id === +i.dataset.id); atual.interp ? mostrarLaudo() : mostrarConferencia(); }; i.addEventListener("click", abrir); i.addEventListener("keydown", e => e.key === "Enter" && abrir()); });
+}
+confirmar($("#bApagar"), "Confirmar: apagar tudo", () => { LAUDOS = []; store.del("laudos"); store.del("perfil"); previas = {}; toast("Dados apagados."); mostrar("inicio"); });
+
+/* ---------------- evolução ---------------- */
+const fmt = v => v == null ? "" : Number(v).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+const dBR = iso => iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : "sem data";
+let GRUPOS = [];
+function grupos() {
+  const g = {};
+  for (const l of LAUDOS) {
+    if (l.status !== "interpretado") continue;
+    const data = dataISO(l.dados.data_coleta) || l.criado.slice(0, 10);
+    for (const r of l.dados.resultados) if (r.codigo) (g[r.codigo] ||= { codigo: r.codigo, nome: POR_COD[r.codigo]?.nome || r.analito, categoria: POR_COD[r.codigo]?.categoria || "", pontos: [] }).pontos.push({ data, ...r });
+  }
+  return Object.values(g).map(x => { x.pontos.sort((a, b) => a.data.localeCompare(b.data)); x.ultimo = x.pontos[x.pontos.length - 1]; return x; })
+    .sort((a, b) => (a.categoria + a.nome).localeCompare(b.categoria + b.nome, "pt-BR"));
+}
+function desenharEvolucao() {
+  const todos = grupos(), fil = $("#filtroEv").value;
+  GRUPOS = todos.filter(g => fil === "todos" || g.pontos.some(p => FORA(p.situacao)));
+  const el = $("#graficos");
+  if (!GRUPOS.length) { el.innerHTML = `<div class="vazio">${todos.length ? "Nenhum exame fora da referência." : "Os gráficos aparecem depois que você explicar pelo menos um laudo."}</div>`; return; }
+  el.innerHTML = GRUPOS.map((g, i) => `<div class="graf"><h4>${esc(g.nome)}</h4>
+    <div class="s">${esc(g.categoria)} · último: <strong>${esc(g.ultimo.valor)} ${esc(g.ultimo.unidade)}</strong> ${selo(g.ultimo)}</div>
+    <div class="fig"><svg data-g="${i}" role="img" aria-label="Evolução de ${esc(g.nome)}"></svg></div>
+    <details><summary>Ver valores (${g.pontos.length})</summary><div class="scroll"><table><thead><tr><th>Coleta</th><th>Resultado</th><th>Referência</th></tr></thead><tbody>
+    ${g.pontos.map(p => `<tr><td>${dBR(p.data)}</td><td>${esc(p.valor)} ${esc(p.unidade)}</td><td>${esc(p.referencia)}</td></tr>`).join("")}</tbody></table></div></details>
+    ${POR_COD[g.codigo]?.descricao ? `<p class="sub pequeno">${esc(POR_COD[g.codigo].descricao)}</p>` : ""}</div>`).join("");
+  $$("#graficos svg").forEach(s => { desenharGrafico(s); ro.observe(s); });
+}
+const ro = new ResizeObserver(es => es.forEach(e => desenharGrafico(e.target)));
+$("#filtroEv").addEventListener("change", desenharEvolucao);
+function desenharGrafico(s) {
+  const g = GRUPOS[+s.dataset.g]; if (!g) return;
+  const W = s.clientWidth, H = s.clientHeight; if (!W) return;
+  const pts = g.pontos.filter(p => p.valor_numerico !== null && unidade(p.unidade) === unidade(g.ultimo.unidade));
+  if (!pts.length) { s.innerHTML = `<text x="0" y="20">Resultado não numérico; veja os valores abaixo.</text>`; return; }
+  const m = { l: 46, r: 12, t: 10, b: 24 }, u = g.ultimo;
+  const vals = pts.map(p => p.valor_numerico).concat([u.ref_min, u.ref_max].filter(v => v != null));
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const folga = (hi - lo || Math.abs(hi) || 1) * 0.15; lo = Math.max(0, lo - folga); hi += folga;
+  const bruto = (hi - lo) / 2, pot = 10 ** Math.floor(Math.log10(bruto)), passo = [1, 2, 2.5, 5, 10].map(k => k * pot).find(v => v >= bruto);
+  lo = Math.floor(lo / passo) * passo; hi = Math.ceil(hi / passo) * passo;
+  const x = i => pts.length === 1 ? m.l + (W - m.l - m.r) / 2 : m.l + i * (W - m.l - m.r) / (pts.length - 1);
+  const y = v => m.t + (H - m.t - m.b) * (1 - (v - lo) / (hi - lo));
+  const ticks = []; for (let t = lo; t <= hi + passo / 2; t += passo) ticks.push(t);
+  const rTop = u.ref_max != null ? y(u.ref_max) : m.t, rBase = u.ref_min != null ? y(u.ref_min) : H - m.b;
+  const pequenoW = W < 260;
+  s.innerHTML = `${ticks.map(t => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="currentColor" stroke-opacity=".12"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${fmt(t)}</text>`).join("")}
+    ${u.ref_min != null || u.ref_max != null ? `<rect x="${m.l}" width="${W - m.l - m.r}" y="${Math.min(rTop, rBase)}" height="${Math.abs(rBase - rTop)}" style="fill:var(--faixa)"/>` : ""}
+    <line class="mira" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" stroke="currentColor" stroke-opacity=".4" visibility="hidden"/>
+    ${pts.length > 1 ? `<path d="${pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.valor_numerico).toFixed(1)}`).join(" ")}" fill="none" style="stroke:var(--serie)" stroke-width="2" stroke-linejoin="round"/>` : ""}
+    ${pts.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.valor_numerico)}" r="${FORA(p.situacao) ? 5 : 4}" style="fill:${FORA(p.situacao) ? "var(--crit)" : "var(--serie)"};stroke:var(--papel)" stroke-width="2"/>`).join("")}
+    ${pts.map((p, i) => (i === 0 || i === pts.length - 1 || (!pequenoW && pts.length <= 4)) ? `<text x="${x(i)}" y="${H - 5}" text-anchor="${pts.length === 1 ? "middle" : i === 0 ? "start" : i === pts.length - 1 ? "end" : "middle"}">${dBR(p.data)}</text>` : "").join("")}
+    <rect class="alvo" x="${m.l}" y="0" width="${Math.max(0, W - m.l - m.r)}" height="${H}" fill="transparent"/>`;
+  const cs = $$("circle", s), mira = $(".mira", s), tip = $("#tip"), alvo = $(".alvo", s);
+  alvo.addEventListener("pointermove", e => {
+    const bx = s.getBoundingClientRect(), px = e.clientX - bx.left;
+    let k = 0; cs.forEach((c, i) => { if (Math.abs(+c.getAttribute("cx") - px) < Math.abs(+cs[k].getAttribute("cx") - px)) k = i; });
+    const p = pts[k], cx = +cs[k].getAttribute("cx"), cy = +cs[k].getAttribute("cy");
+    mira.setAttribute("x1", cx); mira.setAttribute("x2", cx); mira.setAttribute("visibility", "visible");
+    tip.innerHTML = `<strong>${esc(p.valor)} ${esc(p.unidade)}</strong><br>${dBR(p.data)}<br>${SELO[p.situacao] || ""}`; tip.hidden = false;
+    tip.style.left = Math.min(bx.left + cx + 12, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = Math.max(4, bx.top + cy - tip.offsetHeight - 8) + "px";
+  });
+  alvo.addEventListener("pointerleave", () => { tip.hidden = true; mira.setAttribute("visibility", "hidden"); });
+}
+
+/* ---------------- início ---------------- */
+mostrar(perfil()?.aceite ? (LAUDOS.length ? "laudos" : "enviar") : "inicio");
+}
+</script>
+</body>
+</html>

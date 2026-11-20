@@ -68,6 +68,18 @@ Acesse http://localhost:8000. Para testar sem chave de API, cole o conteúdo de
 
 Testes: `pytest`. Os testes não acessam a rede, porque as chamadas ao Claude são simuladas.
 
+### Prévia no claude.ai (sem servidor)
+
+`preview/index.html` é uma versão de página única para testar no claude.ai, onde a leitura e a
+explicação usam o Claude da conta de quem abre a página. As regras de classificação e de valores
+críticos, o catálogo de analitos e os prompts são os mesmos do backend. O `preview/build.py`
+gera a página a partir de `preview/template.html`. Na prévia, os laudos ficam guardados só no
+navegador, e a imagem do documento não é guardada depois que a página é fechada.
+
+```bash
+python preview/build.py   # depois de mudar o template, os prompts ou os CSVs
+```
+
 ### Publicar (Render, plano gratuito)
 
 O processo é o mesmo do CheckExame. O `Dockerfile` e o `render.yaml` já estão prontos.
