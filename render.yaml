@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: seulaudo
+    runtime: docker
+    plan: free
+    healthCheckPath: /saude
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SEULAUDO_SENHA
+        sync: false
+      - key: SEULAUDO_USUARIO
+        value: seulaudo

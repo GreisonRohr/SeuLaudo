@@ -1,0 +1,14 @@
+codigo;unidades;minimo;maximo;mensagem
+K;mmol l;2.8;6.2;Potássio em nível que pode afetar o ritmo do coração.
+NA;mmol l;120;160;Sódio em nível que pode causar confusão mental e convulsões.
+GLI;mg dl;50;400;Glicose em nível que pode causar perda de consciência ou descompensação do diabetes.
+HB;g dl;7;20;Hemoglobina em nível muito alterado.
+PLT;ul;20000;1000000;Plaquetas em nível com risco de sangramento ou trombose.
+PLT;mil ul;20;1000;Plaquetas em nível com risco de sangramento ou trombose.
+LEU;ul;2000;30000;Leucócitos em nível que exige avaliação médica rápida.
+LEU;mil ul;2;30;Leucócitos em nível que exige avaliação médica rápida.
+CA;mg dl;6.5;13;Cálcio em nível que pode afetar músculos, nervos e coração.
+MG;mg dl;1;;Magnésio muito baixo pode afetar o ritmo do coração.
+CREA;mg dl;;7;Creatinina muito alta indica possível perda importante da função dos rins.
+INR;;;5;RNI muito alto indica risco aumentado de sangramento.
+BT;mg dl;;15;Bilirrubina muito alta exige avaliação médica rápida.

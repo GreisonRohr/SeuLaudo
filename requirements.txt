@@ -1,0 +1,9 @@
+anthropic>=2.11,<3
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+pydantic>=2.7
+rapidfuzz>=3.9
+pypdf>=5.0
+pillow>=10.0
+pytest>=8.0

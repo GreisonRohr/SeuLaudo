@@ -1,0 +1,53 @@
+codigo;nome;sinonimos;categoria;descricao
+GLI;Glicose;glicemia|glicemia de jejum|glicose de jejum|glicose jejum|glicose plasmatica;Metabolismo;Quantidade de açúcar no sangue no momento da coleta. Ajuda a rastrear e acompanhar pré-diabetes e diabetes.
+HBA1C;Hemoglobina glicada;hba1c|a1c|hemoglobina glicosilada|glicohemoglobina;Metabolismo;Média aproximada da glicose no sangue nos últimos 2 a 3 meses. Usada para diagnosticar e acompanhar o diabetes.
+INS;Insulina;insulina basal|insulina de jejum;Metabolismo;Hormônio que leva a glicose do sangue para as células. Ajuda a avaliar resistência à insulina.
+COLT;Colesterol total;colesterol;Lipídios;Soma das frações de colesterol no sangue. Interpretado junto com HDL, LDL e triglicerídeos.
+HDL;Colesterol HDL;hdl|hdl colesterol|colesterol bom;Lipídios;Fração do colesterol que ajuda a retirar gordura das artérias. Valores mais altos costumam ser protetores.
+LDL;Colesterol LDL;ldl|ldl colesterol|colesterol ruim;Lipídios;Fração do colesterol que pode se depositar nas artérias. A meta depende do risco cardiovascular de cada pessoa.
+NHDL;Colesterol não-HDL;nao hdl|colesterol nao hdl;Lipídios;Todo o colesterol exceto o HDL. Reflete as partículas que podem se acumular nas artérias.
+VLDL;Colesterol VLDL;vldl;Lipídios;Fração do colesterol ligada ao transporte de triglicerídeos.
+TRIG;Triglicerídeos;triglicerides|triglicerideos|triglicérides|tg;Lipídios;Tipo de gordura no sangue que sobe com açúcar, álcool, excesso de calorias e falta de jejum adequado.
+HB;Hemoglobina;hgb|hb;Hemograma;Proteína dos glóbulos vermelhos que transporta oxigênio. Valores baixos indicam anemia.
+HT;Hematócrito;htc|ht|hct;Hemograma;Porcentagem do sangue ocupada pelos glóbulos vermelhos.
+HEM;Hemácias;eritrocitos|eritrócitos|globulos vermelhos|rbc;Hemograma;Quantidade de glóbulos vermelhos, as células que levam oxigênio ao corpo.
+VCM;VCM;volume corpuscular medio;Hemograma;Tamanho médio dos glóbulos vermelhos. Ajuda a investigar o tipo de anemia (por exemplo, falta de ferro ou de vitamina B12).
+HCM;HCM;hemoglobina corpuscular media;Hemograma;Quantidade média de hemoglobina em cada glóbulo vermelho.
+CHCM;CHCM;concentracao de hemoglobina corpuscular media;Hemograma;Concentração média de hemoglobina dentro dos glóbulos vermelhos.
+RDW;RDW;rdw cv;Hemograma;Variação de tamanho entre os glóbulos vermelhos. Aumenta em algumas anemias.
+LEU;Leucócitos;leucocitos totais|globulos brancos|wbc;Hemograma;Total de glóbulos brancos, as células de defesa. Podem subir em infecções e inflamações.
+NEU;Neutrófilos;segmentados|neutrofilos segmentados;Hemograma;Glóbulos brancos que combatem principalmente bactérias.
+LIN;Linfócitos;linfocitos;Hemograma;Glóbulos brancos ligados à defesa contra vírus e à memória imunológica.
+MON;Monócitos;monocitos;Hemograma;Glóbulos brancos que fagocitam (englobam) microrganismos e restos celulares.
+EOS;Eosinófilos;eosinofilos;Hemograma;Glóbulos brancos que aumentam em alergias e verminoses.
+BAS;Basófilos;basofilos;Hemograma;Glóbulos brancos raros, ligados a reações alérgicas.
+PLT;Plaquetas;contagem de plaquetas|plaquetas totais|plt;Hemograma;Fragmentos de células que ajudam na coagulação do sangue.
+UREIA;Ureia;ureia serica;Rins;Resíduo do metabolismo das proteínas, eliminado pelos rins. Também varia com a hidratação e a dieta.
+CREA;Creatinina;creatinina serica;Rins;Resíduo dos músculos eliminado pelos rins. É o principal exame de sangue para avaliar a função renal.
+TFG;Taxa de filtração glomerular;tfg|tfge|ritmo de filtracao glomerular|egfr|filtracao glomerular estimada;Rins;Estimativa de quanto sangue os rins filtram por minuto, calculada a partir da creatinina, idade e sexo.
+AU;Ácido úrico;acido urico;Metabolismo;Resíduo do metabolismo das purinas. Valores altos estão ligados à gota e a pedras nos rins.
+NA;Sódio;sodio;Eletrólitos;Mineral que regula a água do corpo e a pressão arterial.
+K;Potássio;potassio;Eletrólitos;Mineral essencial para o funcionamento dos músculos e do coração.
+CA;Cálcio;calcio|calcio total;Eletrólitos;Mineral dos ossos, também importante para músculos, nervos e coração.
+MG;Magnésio;magnesio;Eletrólitos;Mineral que participa da função muscular, nervosa e do ritmo cardíaco.
+TGO;AST (TGO);tgo|ast|transaminase oxalacetica|aspartato aminotransferase;Fígado;Enzima presente no fígado, músculos e coração. Sobe quando há lesão dessas células.
+TGP;ALT (TGP);tgp|alt|transaminase piruvica|alanina aminotransferase;Fígado;Enzima mais específica do fígado. Sobe quando há inflamação ou lesão hepática.
+GGT;Gama GT;gama glutamil transferase|gamaglutamiltransferase|ggt;Fígado;Enzima do fígado e das vias biliares. Pode subir com álcool, alguns medicamentos e gordura no fígado.
+FA;Fosfatase alcalina;fosfatase alcalina total;Fígado;Enzima do fígado, vias biliares e ossos.
+BT;Bilirrubina total;bilirrubinas totais;Fígado;Pigmento produzido pela quebra das hemácias e eliminado pelo fígado. Em excesso causa pele amarelada.
+ALB;Albumina;albumina serica;Fígado;Principal proteína do sangue, produzida pelo fígado. Reflete nutrição e função hepática.
+TSH;TSH;hormonio tireoestimulante|tireotrofina;Tireoide;Hormônio da hipófise que comanda a tireoide. Costuma ser o primeiro exame para avaliar a tireoide.
+T4L;T4 livre;t4l|tiroxina livre;Tireoide;Principal hormônio produzido pela tireoide, na forma ativa.
+T3;T3;triiodotironina|t3 total;Tireoide;Hormônio da tireoide, forma mais ativa do T4.
+FERRO;Ferro sérico;ferro;Ferro e vitaminas;Quantidade de ferro circulando no sangue no momento da coleta.
+FERRI;Ferritina;ferritina serica;Ferro e vitaminas;Estoque de ferro do corpo. Baixa na falta de ferro e pode subir em inflamações e excesso de ferro.
+TRANSF;Transferrina;saturacao de transferrina|indice de saturacao de transferrina;Ferro e vitaminas;Proteína que transporta o ferro no sangue.
+B12;Vitamina B12;cobalamina|cianocobalamina;Ferro e vitaminas;Vitamina essencial para os nervos e a formação do sangue.
+VITD;Vitamina D;25 oh vitamina d|25 hidroxivitamina d|vitamina d 25 hidroxi|25oh d;Ferro e vitaminas;Vitamina ligada à saúde dos ossos, produzida com exposição ao sol.
+AF;Ácido fólico;folato;Ferro e vitaminas;Vitamina do complexo B importante para a formação das células do sangue.
+PCR;Proteína C reativa;pcr|pcr ultrassensivel|proteina c reativa ultrassensivel;Inflamação;Proteína que sobe em inflamações e infecções.
+VHS;VHS;velocidade de hemossedimentacao|hemossedimentacao;Inflamação;Exame inespecífico que sobe em inflamações, infecções e outras condições.
+PSA;PSA total;psa|antigeno prostatico especifico;Próstata;Proteína produzida pela próstata. Pode subir com o aumento benigno da próstata, inflamações e câncer.
+CK;CPK;creatinofosfoquinase|ck total|creatinoquinase;Músculos;Enzima dos músculos. Sobe após exercício intenso ou lesão muscular.
+TROPO;Troponina;troponina i|troponina t|troponina ultrassensivel;Coração;Proteína do músculo cardíaco. Elevada pode indicar lesão do coração e exige avaliação médica imediata.
+INR;RNI (INR);rni|inr|tempo de protrombina inr;Coagulação;Mede o tempo de coagulação do sangue de forma padronizada. Usado em quem toma varfarina.

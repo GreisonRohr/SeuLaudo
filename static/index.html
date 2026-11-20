@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SeuLaudo — entenda o resultado dos seus exames</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <h1>SeuLaudo</h1>
+  <nav>
+    <button data-view="laudos">Meus laudos</button>
+    <button data-view="enviar">Enviar laudo</button>
+    <button data-view="evolucao">Evolução</button>
+  </nav>
+  <label class="perfil-sel">Perfil
+    <select id="sel-perfil"></select>
+  </label>
+</header>
+
+<div id="faixa-aviso">
+  Conteúdo educativo. Não substitui a consulta, o diagnóstico ou o tratamento do seu médico.
+</div>
+
+<main>
+  <!-- PERFIL / CONSENTIMENTO -->
+  <section id="view-perfil" class="view" hidden>
+    <div class="card estreito">
+      <h2>Criar perfil</h2>
+      <p class="muted">Você pode ter um perfil para você e outros para familiares (por exemplo, filhos ou pais).
+        Sexo e data de nascimento ajudam a escolher a faixa de referência correta.</p>
+      <form id="form-perfil" class="coluna">
+        <label>Nome <input name="nome" required autocomplete="name"></label>
+        <div class="linha">
+          <label>Nascimento <input name="data_nascimento" placeholder="DD/MM/AAAA" inputmode="numeric"></label>
+          <label>Sexo
+            <select name="sexo"><option value=""></option><option value="F">Feminino</option><option value="M">Masculino</option></select>
+          </label>
+        </div>
+        <div class="termo">
+          <strong>Uso dos seus dados de saúde (LGPD)</strong>
+          <ul>
+            <li>Os laudos que você enviar são dados de saúde, considerados <em>dados sensíveis</em> pela LGPD.</li>
+            <li>Eles ficam guardados neste serviço apenas para mostrar a interpretação e a evolução dos seus exames.</li>
+            <li>Para ler e explicar o laudo, o documento é enviado à API do Claude (Anthropic), sem o seu nome no pedido de interpretação.</li>
+            <li>Você pode excluir um laudo ou o perfil inteiro, com todos os dados, a qualquer momento.</li>
+            <li>A interpretação é educativa: não é diagnóstico e não substitui o seu médico.</li>
+          </ul>
+          <label class="check"><input type="checkbox" name="consentimento" required>
+            Li e concordo com o uso dos meus dados de saúde para essas finalidades.</label>
+        </div>
+        <div class="linha">
+          <button type="submit" class="primario">Criar perfil</button>
+          <button type="button" id="btn-cancelar-perfil">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- LISTA DE LAUDOS -->
+  <section id="view-laudos" class="view" hidden>
+    <div class="card">
+      <div class="topo">
+        <h2>Meus laudos</h2>
+        <button class="primario" data-ir="enviar">Enviar novo laudo</button>
+      </div>
+      <div id="lista-laudos"></div>
+      <details class="zona-perigo">
+        <summary>Excluir este perfil</summary>
+        <p>Apaga o perfil, todos os laudos, arquivos e o histórico. Não dá para desfazer.</p>
+        <button id="btn-excluir-perfil" class="perigo">Excluir perfil e todos os dados</button>
+      </details>
+    </div>
+  </section>
+
+  <!-- ENVIAR -->
+  <section id="view-enviar" class="view" hidden>
+    <div class="card estreito">
+      <h2>Enviar laudo</h2>
+      <form id="form-upload" class="coluna">
+        <div id="dropzone">
+          <div class="botoes">
+            <label class="btnf primario">Escolher arquivo<input type="file" id="arquivo" accept="image/*,application/pdf,text/plain"></label>
+            <label class="btnf">Tirar foto<input type="file" id="camera" accept="image/*" capture="environment"></label>
+          </div>
+          <p class="muted">PDF do laboratório ou foto do laudo (todas as páginas visíveis, sem reflexo).
+            No computador, você pode arrastar o arquivo para cá.</p>
+          <p id="arquivo-nome"></p>
+          <img id="mini" alt="Laudo selecionado" hidden>
+        </div>
+        <details>
+          <summary>…ou colar o texto do laudo</summary>
+          <textarea name="texto" rows="8" placeholder="Glicose ....: 105 mg/dL   VR: 70 a 99 mg/dL"></textarea>
+        </details>
+        <label>Leitura
+          <select name="extrator" id="sel-extrator"></select>
+        </label>
+        <small id="extrator-aviso" class="aviso"></small>
+        <button type="submit" id="btn-ler" class="primario">Ler laudo</button>
+        <span id="lendo" class="muted" hidden>Lendo o laudo… pode levar até um minuto.</span>
+      </form>
+    </div>
+  </section>
+
+  <!-- CONFERIR TRANSCRIÇÃO -->
+  <section id="view-conferir" class="view" hidden>
+    <div class="dividido">
+      <div class="card painel-doc">
+        <div class="topo"><strong>Documento enviado</strong></div>
+        <div id="doc-preview"></div>
+      </div>
+      <form id="form-conferir" class="card">
+        <h2>Confira a leitura</h2>
+        <p class="muted">Compare com o documento ao lado e corrija o que estiver diferente. Campos lidos com dúvida
+          aparecem em amarelo. A interpretação usa exatamente estes valores.</p>
+        <div id="alertas-leitura"></div>
+        <div class="grade">
+          <label>Tipo
+            <select data-c="tipo"><option value="laboratorial">Exames laboratoriais</option>
+              <option value="imagem">Exame de imagem</option><option value="outro">Outro laudo descritivo</option></select>
+          </label>
+          <label>Data da coleta <input data-c="data_coleta" placeholder="DD/MM/AAAA"></label>
+          <label class="span2">Laboratório / clínica <input data-c="laboratorio"></label>
+          <label>Sexo
+            <select data-c="paciente.sexo"><option value=""></option><option value="F">Feminino</option><option value="M">Masculino</option></select>
+          </label>
+          <label>Idade <input data-c="paciente.idade"></label>
+          <label class="span2">Médico solicitante <input data-c="medico_solicitante"></label>
+        </div>
+
+        <h3>Resultados</h3>
+        <div class="tabela-rolagem">
+          <table id="tab-resultados">
+            <thead><tr><th>Exame</th><th>Resultado</th><th>Unidade</th><th>Referência</th><th></th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <button type="button" id="btn-add-res" class="mini">+ Adicionar resultado</button>
+
+        <div id="bloco-descritivo">
+          <h3>Laudo descritivo</h3>
+          <label>Exame <input data-c="titulo_exame"></label>
+          <label>Achados <textarea data-c="achados" rows="5"></textarea></label>
+          <label>Conclusão <textarea data-c="conclusao" rows="3"></textarea></label>
+        </div>
+
+        <div class="acoes">
+          <button type="submit" class="primario" id="btn-interpretar">Salvar e interpretar</button>
+          <button type="button" id="btn-basico" title="Sem IA: apenas a comparação com a referência e descrições do catálogo">Interpretação básica</button>
+          <span id="interpretando" class="muted" hidden>Preparando a explicação…</span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- INTERPRETAÇÃO -->
+  <section id="view-interpretacao" class="view" hidden>
+    <article class="card relatorio" id="relatorio"></article>
+  </section>
+
+  <!-- EVOLUÇÃO -->
+  <section id="view-evolucao" class="view" hidden>
+    <div class="card">
+      <h2>Evolução dos seus exames</h2>
+      <p class="muted">Cada gráfico junta o mesmo exame de laudos diferentes, mesmo de laboratórios diferentes.
+        A faixa sombreada é a referência do laboratório. Compare valores apenas quando a unidade for a mesma.</p>
+      <div class="linha filtros">
+        <label>Mostrar
+          <select id="filtro-evolucao">
+            <option value="todos">Todos os exames</option>
+            <option value="alterados">Só os que já vieram fora da referência</option>
+          </select>
+        </label>
+      </div>
+      <div id="graficos"></div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" hidden></div>
+<div id="tooltip" role="tooltip" hidden></div>
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.pytest_cache/
+# Dados dos pacientes (laudos enviados e banco): nunca no Git
+dados/

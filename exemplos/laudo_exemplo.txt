@@ -1,0 +1,26 @@
+Laboratório: Laboratório Exemplo de Análises Clínicas
+Paciente: Maria Aparecida Souza
+Data de nascimento: 14/03/1972 | Idade: 54 anos | Sexo: F
+Médico solicitante: Dr. João Pereira
+Data da coleta: 10/11/2026
+
+HEMOGRAMA COMPLETO
+Hemoglobina ............: 11,2 g/dL        VR: 12,0 a 16,0 g/dL
+Hematócrito ............: 34,8 %           VR: 36,0 a 46,0 %
+VCM ....................: 76,5 fL          VR: 80,0 a 100,0 fL
+Leucócitos .............: 6.800 /mm³       VR: 4.000 a 11.000 /mm³
+Plaquetas ..............: 245.000 /mm³     VR: 150.000 a 450.000 /mm³
+
+BIOQUÍMICA
+Glicose ................: 112 mg/dL        VR: 70 a 99 mg/dL
+Hemoglobina glicada ....: 6,1 %            VR: Inferior a 5,7 %
+Colesterol total .......: 228 mg/dL        VR: Inferior a 190 mg/dL
+Colesterol HDL .........: 52 mg/dL         VR: Superior a 40 mg/dL
+Colesterol LDL .........: 148 mg/dL        VR: Inferior a 130 mg/dL
+Triglicerídeos .........: 140 mg/dL        VR: Inferior a 150 mg/dL
+Creatinina .............: 0,82 mg/dL       VR: 0,50 a 1,10 mg/dL
+Potássio ...............: 4,3 mEq/L        VR: 3,5 a 5,1 mEq/L
+TSH ....................: 3,10 µUI/mL      VR: 0,45 a 4,50 µUI/mL
+Ferritina ..............: 9 ng/mL          VR: 15 a 150 ng/mL
+
+Liberado eletronicamente em 11/11/2026.
