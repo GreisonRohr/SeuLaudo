@@ -2,231 +2,404 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SeuLaudo — prévia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* VOICE: calma, clínica, clara; fala com o paciente, não com o médico.
-   IDEA: o laudo impresso do laboratório, relido com um tradutor ao lado.
-   PICTURE: a tabela de resultados com selos e a faixa de referência; na evolução, o gráfico por exame.
-   COLOUR and TYPE: papel branco, tinta azul-petróleo profunda, laranja para "fora da referência", vermelho só para crítico; IBM Plex Sans.
-   LAYOUT: uma coluna calma para enviar e ler; documento ao lado da conferência a partir de 900px. */
+/* VOICE: acolhedora e clara, como um bom app de saúde; fala com o paciente.
+   IDEA: o laudo impresso traduzido em fichas — cada exame vira um cartão com a régua da referência.
+   PICTURE: a régua de referência (faixa verde, marcador no seu valor) em cada exame; contadores no topo do laudo.
+   COLOUR and TYPE: fundo claro neutro, petróleo #0b5d6b dominante, menta de apoio, coral para "fora", vermelho só para crítico; Figtree.
+   LAYOUT: fluxo em 3 passos; no celular, abas no rodapé e botão principal fixo; no computador, documento ao lado da conferência. */
 :root{color-scheme:light dark;
-  --bg:light-dark(#f3f5f7,#101418);--papel:light-dark(#ffffff,#171d23);--ink:light-dark(#14212e,#e8edf2);--sub:light-dark(#566270,#a3afbb);
-  --linha:light-dark(#dde3e9,#2b343d);--marca:light-dark(#0e4a6e,#7cc0e8);--marca-ink:light-dark(#ffffff,#0b1a24);--suave:light-dark(#e7f0f6,#1d2a34);
-  --ok:light-dark(#0d6b2f,#6fd393);--ok-bg:light-dark(#e6f4ea,#173222);--fora:light-dark(#8a4b00,#f2b866);--fora-bg:light-dark(#fff1de,#3a2a12);
-  --crit:light-dark(#b42318,#ff8a80);--crit-bg:light-dark(#fdecea,#3d1a17);--serie:light-dark(#2a78d6,#5aa0f0);--faixa:light-dark(rgba(13,107,47,.11),rgba(111,211,147,.14));
-  --amarelo:light-dark(#fff7dc,#3a3214)}
+  --bg:light-dark(#f2f5f6,#0d1416);--card:light-dark(#ffffff,#162024);--ink:light-dark(#122127,#e6eef0);--sub:light-dark(#5b6b71,#9fb0b6);
+  --linha:light-dark(#e2e8ea,#26343a);--marca:light-dark(#0b5d6b,#5cc4d1);--marca-ink:light-dark(#ffffff,#06262c);--marca-suave:light-dark(#e3f2f3,#16323a);
+  --ok:light-dark(#11795a,#5fd3a4);--ok-bg:light-dark(#e2f5ee,#133429);--fora:light-dark(#b4521b,#ffab73);--fora-bg:light-dark(#fdeee3,#3b2416);
+  --crit:light-dark(#c4281c,#ff8a7f);--crit-bg:light-dark(#fde9e7,#3d1916);--faixa:light-dark(#c9ecdc,#1f5a43);--trilho:light-dark(#edf1f2,#223035);
+  --amarelo:light-dark(#fff6d6,#3a3216);--sombra:0 1px 2px rgba(10,30,40,.06),0 8px 24px rgba(10,30,40,.06);--r:18px}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif;overflow-x:clip}
-header{background:var(--marca);color:var(--marca-ink);padding:14px max(4vw,16px);display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-header h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
-header h1 small{font-weight:400;font-size:14px;opacity:.8;margin-left:6px}
-nav{display:flex;gap:4px;flex-wrap:wrap}
-nav button{background:transparent;color:inherit;border:0;min-height:40px;padding:6px 14px;border-radius:8px;font:inherit;font-size:15px;cursor:pointer}
-nav button.ativo,nav button:hover{background:color-mix(in srgb,var(--marca-ink) 18%,transparent)}
-.faixa-aviso{background:var(--amarelo);color:var(--ink);font-size:14px;padding:7px max(4vw,16px);text-align:center;border-bottom:1px solid var(--linha)}
-main{max-width:1240px;margin:0 auto;padding:20px max(3vw,12px) 48px}
-.card{background:var(--papel);border:1px solid var(--linha);border-radius:12px;padding:clamp(16px,2.5vw,26px)}
-.estreito{max-width:720px;margin:0 auto}
-h2{font-size:clamp(22px,3vw,30px);line-height:1.15;margin:0 0 6px;text-wrap:balance}
-h3{font-size:18px;margin:22px 0 8px}
-p{margin:6px 0}.sub{color:var(--sub)}.pequeno{font-size:14px}
-label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--sub)}
-input,select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--papel);border:1px solid var(--linha);border-radius:8px;padding:8px 10px;width:100%}
-input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid color-mix(in srgb,var(--serie) 55%,transparent);outline-offset:1px}
-input.incerto{background:var(--amarelo);border-color:#d9a300}
-button{font:inherit;font-size:15px;min-height:44px;padding:8px 18px;border-radius:8px;border:1px solid var(--linha);background:var(--papel);color:var(--ink);cursor:pointer}
-button:hover{background:var(--suave)}button:disabled{opacity:.5;cursor:default}
-button.pri{background:var(--marca);border-color:var(--marca);color:var(--marca-ink);font-weight:600}
-button.perigo{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 40%,transparent)}
-button.mini{min-height:34px;padding:4px 10px;font-size:14px}
-.linha{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}.linha>label{flex:1 1 160px}
-.col{display:flex;flex-direction:column;gap:14px}
-.aviso{border-radius:10px;padding:10px 14px;font-size:15px;background:var(--amarelo);border:1px solid color-mix(in srgb,#d9a300 45%,transparent)}
-.aviso.erro,.alerta-crit{background:var(--crit-bg);border:1px solid color-mix(in srgb,var(--crit) 35%,transparent);color:var(--ink)}
-.aviso ul,.alerta-crit ul{margin:4px 0 0;padding-left:20px}
-#drop{border:2px dashed var(--linha);border-radius:12px;padding:22px 14px;text-align:center}
-#drop.on{border-color:var(--serie);background:var(--suave)}
-.btnf{display:inline-flex;align-items:center;min-height:48px;padding:10px 22px;border:1px solid var(--linha);border-radius:10px;font-size:16px;color:var(--ink);background:var(--papel);cursor:pointer;position:relative;overflow:hidden}
-.btnf.pri{background:var(--marca);border-color:var(--marca);color:var(--marca-ink);font-weight:600}
-.btnf input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-.botoes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
-#mini{display:block;max-width:200px;max-height:200px;margin:10px auto 0;border-radius:8px;border:1px solid var(--linha)}
-#mini[hidden]{display:none}
-.modos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:8px}
-.modos label{flex-direction:row;gap:10px;align-items:flex-start;border:1px solid var(--linha);border-radius:10px;padding:10px 12px;color:var(--ink);cursor:pointer}
-.modos input{width:auto;margin-top:5px}.modos b{display:block}
-.termo{background:var(--suave);border-radius:10px;padding:12px 16px;font-size:15px}.termo ul{margin:6px 0 10px;padding-left:20px}
-.check{flex-direction:row;align-items:flex-start;gap:10px;color:var(--ink);font-size:15px}.check input{width:auto;margin-top:5px}
-.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--linha);border-top-color:var(--serie);border-radius:50%;animation:g 1s linear infinite;vertical-align:-2px;margin-right:8px}
-@keyframes g{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.spin{animation:none}}
-.dividido{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:16px;align-items:start}
-@media(max-width:900px){.dividido{grid-template-columns:minmax(0,1fr)}}
-.doc{position:sticky;top:12px}@media(max-width:900px){.doc{position:static}}
-#docPrev{max-height:calc(100vh - 120px);overflow:auto;background:var(--bg);border-radius:8px}
-@media(max-width:900px){#docPrev{max-height:55vh}}
-#docPrev img{width:100%;display:block;margin-bottom:6px;cursor:zoom-in}#docPrev img.zoom{width:200%;cursor:zoom-out}
-#docPrev pre{white-space:pre-wrap;margin:0;padding:12px;font-size:13px;background:var(--papel)}
-.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:10px}
-.scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-th{text-align:left;font-size:13px;color:var(--sub);font-weight:500;padding:6px 4px;border-bottom:1px solid var(--linha)}
-td{padding:5px 4px;border-bottom:1px solid var(--linha);vertical-align:middle}
-#tabRes input{padding:6px 8px}#tabRes td small{display:block;color:var(--sub);font-size:13px}
-#tabRes td:nth-child(1){min-width:150px}#tabRes td:nth-child(2),#tabRes td:nth-child(3){min-width:92px}#tabRes td:nth-child(4){min-width:150px}
-.selo{display:inline-flex;gap:5px;align-items:center;font-size:13px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+svg.i{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--marca) 50%,transparent);outline-offset:2px}
+
+/* topo e navegação */
+.topo{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--linha);padding:10px max(4vw,16px);padding-top:max(10px,env(safe-area-inset-top))}
+.topo-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+.logo b{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:var(--marca);color:var(--marca-ink)}
+.logo small{font-weight:600;font-size:12px;color:var(--marca);background:var(--marca-suave);padding:2px 8px;border-radius:99px;letter-spacing:0}
+.abas{display:flex;gap:4px;margin-left:auto;background:var(--card);border:1px solid var(--linha);padding:4px;border-radius:14px}
+.abas button{display:flex;align-items:center;gap:8px;border:0;background:none;padding:8px 14px;border-radius:10px;font-weight:600;color:var(--sub);min-height:40px}
+.abas button.ativo{background:var(--marca);color:var(--marca-ink)}
+.abas button:not(.ativo):hover{color:var(--ink);background:var(--marca-suave)}
+@media(max-width:720px){
+  .topo{backdrop-filter:none;background:var(--bg)}
+  .abas{position:fixed;left:0;right:0;bottom:0;margin:0;border-radius:0;border:0;border-top:1px solid var(--linha);justify-content:space-around;padding:6px 6px max(6px,env(safe-area-inset-bottom));z-index:6}
+  .abas button{flex-direction:column;gap:2px;font-size:12px;padding:6px 10px;flex:1}
+  .abas button.ativo{background:var(--marca-suave);color:var(--marca)}
+  main{padding-bottom:96px!important}
+}
+main{max-width:1180px;margin:0 auto;padding:22px max(4vw,16px) 56px}
+.educ{display:flex;gap:8px;align-items:center;justify-content:center;font-size:13px;color:var(--sub);margin:28px auto 0;text-align:center;max-width:620px}
+
+/* blocos */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sombra);padding:clamp(18px,3vw,28px)}
+.estreito{max-width:680px;margin:0 auto}
+h1,h2{letter-spacing:-.02em;text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.08;font-weight:800}
+h2{font-size:clamp(22px,3.2vw,30px);line-height:1.15;font-weight:800}
+h3{font-size:18px;margin:0 0 10px;font-weight:700}
+p{margin:6px 0}.sub{color:var(--sub)}.pq{font-size:14px}
+.col{display:flex;flex-direction:column;gap:16px}.lin{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 20px;border-radius:14px;border:1px solid var(--linha);background:var(--card);font-weight:600;font-size:16px}
+.btn:hover{background:var(--marca-suave)}.btn:disabled{opacity:.5;cursor:default}
+.btn.pri{background:var(--marca);border-color:var(--marca);color:var(--marca-ink)}.btn.pri:hover{filter:brightness(1.08)}
+.btn.grande{min-height:56px;font-size:17px;border-radius:16px;padding:12px 26px}
+.btn.texto{border:0;background:none;color:var(--marca);padding:8px 6px;min-height:40px}
+.btn.texto:hover{text-decoration:underline;background:none}
+.btn.peq{min-height:38px;padding:6px 12px;font-size:14px;border-radius:11px}
+.btn.perigo{color:var(--crit)}
+label.campo{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--sub)}
+input,select,textarea{font-size:16px;background:var(--card);border:1.5px solid var(--linha);border-radius:12px;padding:11px 13px;width:100%;color:var(--ink)}
+input:focus,select:focus,textarea:focus{border-color:var(--marca);outline:none}
+input.incerto{background:var(--amarelo);border-color:#e0b100}
+.grade2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px}
+
+/* passos */
+.passos{display:flex;gap:6px;align-items:center;justify-content:center;margin:0 auto 20px;font-size:14px;font-weight:600;color:var(--sub);flex-wrap:wrap}
+.passos span{display:flex;align-items:center;gap:8px}
+.passos i{font-style:normal;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--trilho);font-size:13px}
+.passos .feito i{background:var(--ok-bg);color:var(--ok)}.passos .agora{color:var(--ink)}.passos .agora i{background:var(--marca);color:var(--marca-ink)}
+.passos hr{width:28px;border:0;border-top:2px solid var(--linha);margin:0}
+
+/* início */
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:center}
+@media(max-width:820px){.hero{grid-template-columns:minmax(0,1fr)}}
+.ilustra{position:relative;background:var(--marca);border-radius:28px;padding:26px;color:var(--marca-ink);overflow:hidden;min-height:300px}
+.ilustra .folha{background:var(--card);color:var(--ink);border-radius:16px;padding:16px 18px;box-shadow:0 18px 40px rgba(0,0,0,.18);position:relative}
+.ilustra .folha+.folha{margin:-10px 0 0 34px;transform:rotate(-2deg)}
+.etapas{display:grid;gap:12px;margin:18px 0}
+.etapa{display:flex;gap:14px;align-items:flex-start}
+.etapa b{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--marca-suave);color:var(--marca);flex:none}
+.termo{background:var(--bg);border-radius:14px;padding:14px 16px;font-size:15px}
+.termo ul{margin:8px 0 0;padding-left:20px}.termo li{margin:3px 0}
+.check{display:flex;gap:12px;align-items:flex-start;font-size:15px;cursor:pointer}
+.check input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:var(--marca)}
+
+/* envio */
+.drop{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;border:2px dashed color-mix(in srgb,var(--marca) 35%,var(--linha));border-radius:22px;padding:34px 18px;background:color-mix(in srgb,var(--marca-suave) 45%,var(--card));transition:background .15s,border-color .15s}
+.drop.on{background:var(--marca-suave);border-color:var(--marca)}
+.drop .bola{display:grid;place-items:center;width:72px;height:72px;border-radius:24px;background:var(--marca);color:var(--marca-ink)}
+.drop .bola svg{width:34px;height:34px}
+.btnf{position:relative;overflow:hidden}.btnf input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.escolhido{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--linha);border-radius:14px;padding:10px 12px;text-align:left;width:min(420px,100%)}
+.escolhido img{width:52px;height:52px;object-fit:cover;border-radius:10px}
+.escolhido .ic{display:grid;place-items:center;width:52px;height:52px;border-radius:10px;background:var(--marca-suave);color:var(--marca)}
+.mais{display:flex;flex-wrap:wrap;gap:4px 18px;justify-content:center}
+.chave{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 2px;font-size:15px}
+.chave input{appearance:none;width:48px;height:28px;border-radius:99px;background:var(--trilho);border:0;padding:0;position:relative;cursor:pointer;flex:none;transition:background .15s}
+.chave input::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.chave input:checked{background:var(--marca)}.chave input:checked::after{transform:translateX(20px)}
+.aviso{border-radius:14px;padding:12px 16px;font-size:15px;background:var(--amarelo)}
+.aviso.erro{background:var(--crit-bg)}
+.aviso ul{margin:4px 0 0;padding-left:20px}
+.carregando{display:flex;flex-direction:column;align-items:center;gap:16px;padding:40px 10px;text-align:center}
+.pulso{width:84px;height:84px;border-radius:28px;background:var(--marca);color:var(--marca-ink);display:grid;place-items:center;animation:pulso 1.6s ease-in-out infinite}
+.pulso svg{width:38px;height:38px}
+@keyframes pulso{50%{transform:scale(.92);box-shadow:0 0 0 14px color-mix(in srgb,var(--marca) 15%,transparent)}}
+.barra-prog{width:min(320px,80%);height:6px;border-radius:9px;background:var(--trilho);overflow:hidden}
+.barra-prog i{display:block;height:100%;width:30%;background:var(--marca);border-radius:9px;animation:vai 1.4s ease-in-out infinite}
+@keyframes vai{0%{transform:translateX(-100%)}100%{transform:translateX(340%)}}
+@media(prefers-reduced-motion:reduce){.pulso,.barra-prog i{animation:none}}
+
+/* conferência */
+.dividido{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:20px;align-items:start}
+@media(max-width:900px){.dividido{grid-template-columns:minmax(0,1fr)}.so-desk{display:none}}
+@media(min-width:901px){.so-cel{display:none!important}}
+.doc{position:sticky;top:84px}
+.docprev{max-height:calc(100vh - 170px);overflow:auto;border-radius:12px;background:var(--bg)}
+.docprev img{width:100%;display:block;margin-bottom:6px;cursor:zoom-in}.docprev img.zoom{width:220%;cursor:zoom-out}
+.docprev pre{white-space:pre-wrap;margin:0;padding:14px;font-size:13px;background:var(--card)}
+.segm{display:flex;background:var(--trilho);border-radius:14px;padding:4px;margin-bottom:14px}
+.segm button{flex:1;border:0;background:none;border-radius:11px;padding:10px;font-weight:600;color:var(--sub);min-height:44px}
+.segm button.ativo{background:var(--card);color:var(--ink);box-shadow:var(--sombra)}
+.res-lista{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.res{border:1.5px solid var(--linha);border-radius:16px;background:var(--card)}
+.res.duvida{border-color:#e0b100;background:color-mix(in srgb,var(--amarelo) 55%,var(--card))}
+.res-topo{display:flex;align-items:center;gap:12px;padding:12px 14px;width:100%;border:0;background:none;text-align:left;border-radius:16px}
+.res-topo .nome{flex:1}.res-topo .nome strong{display:block;font-size:16px}.res-topo .nome small{color:var(--sub);font-size:13px}
+.res-topo .val{text-align:right;white-space:nowrap}.res-topo .val strong{font-size:18px}.res-topo .val small{display:block;color:var(--sub);font-size:12px}
+.res-topo svg.i{color:var(--sub);width:18px;height:18px}
+.res-edit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 14px 14px}
+.res-edit .larga{grid-column:1/-1}
+.barra-fixa{position:sticky;bottom:0;margin:18px calc(-1*clamp(18px,3vw,28px)) calc(-1*clamp(18px,3vw,28px));padding:14px clamp(18px,3vw,28px);background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--linha);border-radius:0 0 var(--r) var(--r);display:flex;gap:10px;flex-wrap:wrap;align-items:center;z-index:2}
+@media(max-width:720px){.barra-fixa{bottom:68px;flex-wrap:nowrap;gap:8px}.barra-fixa .btn{min-height:52px;font-size:15px;padding:10px 12px}.barra-fixa .btn.grande{flex:1 1 auto!important}#bBasico{flex:0 0 auto}}
+details.det{border-top:1px solid var(--linha);margin-top:14px;padding-top:4px}
+details.det>summary{cursor:pointer;font-weight:600;padding:10px 0;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.det>summary::-webkit-details-marker{display:none}
+details.det>summary::after{content:"+";font-size:22px;color:var(--sub)}details.det[open]>summary::after{content:"–"}
+
+/* selos */
+.selo{display:inline-flex;gap:5px;align-items:center;font-size:13px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap}
 .selo.normal{color:var(--ok);background:var(--ok-bg)}.selo.alto,.selo.baixo,.selo.alterado{color:var(--fora);background:var(--fora-bg)}
-.selo.critico{color:#fff;background:#b42318}.selo.sem_referencia{color:var(--sub);background:var(--suave)}
-.acoes{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
-.resumo{font-size:17px;background:var(--suave);border-radius:10px;padding:14px 18px;margin:14px 0}
-.itens{display:grid;gap:10px}
-.item{border:1px solid var(--linha);border-radius:10px;padding:12px 16px;background:var(--papel)}
-.item.fora{border-left:5px solid #e8a33c}.item.critico{border-left:5px solid #b42318}
-.item .t{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
-.item .v{font-size:16px}.item .v small{color:var(--sub);font-size:14px}
-.item ul{margin:4px 0;padding-left:20px}
-summary{cursor:pointer;color:var(--serie);margin:10px 0;min-height:32px}
-.legal{font-size:14px;color:var(--sub);border-top:1px solid var(--linha);padding-top:12px;margin-top:22px}
-.laudo-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid var(--linha);cursor:pointer;flex-wrap:wrap}
-.laudo-item:hover{background:var(--suave)}
-.vazio{text-align:center;padding:32px 10px;color:var(--sub)}
-#graficos{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:14px}
-.graf{border:1px solid var(--linha);border-radius:10px;padding:12px 14px;background:var(--papel)}
-.graf h4{margin:0;font-size:16px}.graf .s{font-size:13px;color:var(--sub);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.fig{position:relative;height:160px;margin-top:6px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.selo.critico{color:#fff;background:#c4281c}.selo.sem_referencia{color:var(--sub);background:var(--trilho)}
+
+/* laudo explicado */
+.cab-laudo{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.contadores{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
+.cont{border:0;border-radius:16px;padding:14px;text-align:left;background:var(--bg);display:flex;flex-direction:column;gap:2px;min-height:84px}
+.cont b{font-size:clamp(26px,4vw,34px);line-height:1;font-weight:800}
+.cont span{font-size:14px;color:var(--sub);font-weight:600}
+.cont.ok b{color:var(--ok)}.cont.fora b{color:var(--fora)}.cont.crit b{color:var(--crit)}
+.cont.ativo{outline:2px solid var(--marca)}
+.alerta-crit{display:flex;gap:12px;background:var(--crit-bg);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.alerta-crit svg{color:var(--crit)}.alerta-crit ul{margin:4px 0 0;padding-left:18px}
+.resumo{font-size:17px;line-height:1.6;background:var(--marca-suave);border-radius:16px;padding:16px 18px}
+.resumo .ia{display:flex;gap:6px;align-items:center;font-size:12px;font-weight:700;color:var(--marca);margin-bottom:6px;text-transform:none}
+.filtros{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 12px}
+.chip{border:1.5px solid var(--linha);background:var(--card);border-radius:99px;padding:8px 14px;font-weight:600;font-size:14px;min-height:40px}
+.chip.ativo{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.exames{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:12px}
+.exame{border:1.5px solid var(--linha);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--card)}
+.exame.fora{border-color:color-mix(in srgb,var(--fora) 40%,var(--linha))}.exame.critico{border-color:var(--crit);box-shadow:0 0 0 3px var(--crit-bg)}
+.exame .t{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.exame .t strong{font-size:17px}
+.exame .valor{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.exame .valor small{font-size:15px;font-weight:600;color:var(--sub)}
+.exame p{margin:0;font-size:15px}
+.exame details summary{cursor:pointer;color:var(--marca);font-weight:600;font-size:14px;padding:4px 0}
+.exame ul{margin:6px 0 0;padding-left:18px;font-size:15px}
+.regua{position:relative;height:42px;margin-top:2px}
+.regua .trilho{position:absolute;left:0;right:0;top:12px;height:10px;border-radius:9px;background:var(--trilho)}
+.regua .ref{position:absolute;top:12px;height:10px;background:var(--faixa)}
+.regua .marc{position:absolute;top:5px;width:24px;height:24px;margin-left:-12px;border-radius:50%;border:4px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.regua .lim{position:absolute;top:26px;font-size:12px;color:var(--sub);transform:translateX(-50%);white-space:nowrap}
+.proximos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:12px;margin-top:12px}
+.bloco{background:var(--bg);border-radius:18px;padding:18px}
+.bloco h3{display:flex;gap:10px;align-items:center}.bloco h3 svg{color:var(--marca)}
+.bloco ul{margin:0;padding-left:20px}.bloco li{margin:6px 0}
+.perg{list-style:none;padding:0!important}
+.perg label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.perg input{width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--marca)}
+.perg input:checked+span{color:var(--sub);text-decoration:line-through}
+.legal{font-size:14px;color:var(--sub);margin-top:22px}
+
+/* laudos */
+.lista-laudos{display:grid;gap:10px}
+.laudo-card{display:flex;align-items:center;gap:14px;border:1.5px solid var(--linha);border-radius:18px;padding:14px;background:var(--card);text-align:left;width:100%}
+.laudo-card:hover{border-color:var(--marca)}
+.data-bloco{display:grid;place-items:center;width:58px;height:62px;border-radius:14px;background:var(--marca-suave);color:var(--marca);flex:none;line-height:1.05;text-align:center}
+.data-bloco b{font-size:22px;font-weight:800}.data-bloco small{font-size:12px;font-weight:700;text-transform:uppercase}
+.laudo-card .meio{flex:1}.laudo-card .meio strong{display:block}
+.vazio{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:40px 10px;color:var(--sub)}
+.vazio .bola{display:grid;place-items:center;width:68px;height:68px;border-radius:22px;background:var(--marca-suave);color:var(--marca)}
+
+/* evolução */
+.busca{position:relative;flex:1 1 240px}.busca svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--sub)}.busca input{padding-left:42px}
+.graficos{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:12px;margin-top:14px}
+.graf{border:1.5px solid var(--linha);border-radius:18px;padding:16px;background:var(--card)}
+.graf .t{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.graf .ult{font-size:24px;font-weight:800;letter-spacing:-.02em}.graf .ult small{font-size:14px;color:var(--sub);font-weight:600}
+.fig{position:relative;height:150px;margin-top:8px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .fig text{font-size:12px;fill:var(--sub)}
-#tip{position:fixed;z-index:9;pointer-events:none;background:var(--papel);border:1px solid var(--linha);border-radius:8px;padding:6px 10px;font-size:14px;box-shadow:0 6px 18px rgba(0,0,0,.15)}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--papel);padding:10px 18px;border-radius:10px;z-index:10;max-width:92vw}
-@media(max-width:600px){table{font-size:14px}header{gap:8px}}
+.graf details summary{cursor:pointer;color:var(--marca);font-weight:600;font-size:14px;padding:6px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;color:var(--sub);font-weight:600;padding:6px 4px;border-bottom:1px solid var(--linha)}td{padding:6px 4px;border-bottom:1px solid var(--linha)}
+#tip{position:fixed;z-index:9;pointer-events:none;background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:8px 12px;font-size:14px;box-shadow:var(--sombra)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:12px 18px;border-radius:14px;z-index:10;max-width:92vw;font-weight:500;box-shadow:var(--sombra)}
+@media(max-width:720px){#toast{bottom:92px}}
+@media(max-width:520px){.contadores{gap:6px}.cont{padding:12px 10px}.res-edit{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
-<header>
-  <h1>SeuLaudo<small>prévia</small></h1>
-  <nav>
-    <button data-v="enviar">Enviar laudo</button>
-    <button data-v="laudos">Meus laudos</button>
-    <button data-v="evolucao">Evolução</button>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 16V4m0 0-5 5m5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+  <symbol id="i-lista" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
+  <symbol id="i-graf" viewBox="0 0 24 24"><path d="M4 19h16"/><path d="m5 15 4-5 4 3 6-7"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-alerta" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4m0 3v.01"/></symbol>
+  <symbol id="i-lapis" viewBox="0 0 24 24"><path d="m4 20 4-1 11-11-3-3L5 16z"/></symbol>
+  <symbol id="i-lixo" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-copia" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-baixo" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-brilho" viewBox="0 0 24 24"><path d="M12 3v4m0 10v4M3 12h4m10 0h4M6 6l2.5 2.5m7 7L18 18M6 18l2.5-2.5m7-7L18 6"/></symbol>
+  <symbol id="i-pergunta" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6m0 3v.01"/></symbol>
+  <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-folha" viewBox="0 0 24 24"><path d="M5 19c8 0 14-6 14-14C11 5 5 11 5 19zm0 0 8-8"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4m6-4v4"/></symbol>
+  <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/></symbol>
+</svg>
+
+<header class="topo"><div class="topo-in">
+  <div class="logo"><b><svg class="i"><use href="#i-doc"/></svg></b>SeuLaudo <small>prévia</small></div>
+  <nav class="abas" id="abas">
+    <button data-v="enviar"><svg class="i"><use href="#i-up"/></svg>Enviar</button>
+    <button data-v="laudos"><svg class="i"><use href="#i-lista"/></svg>Meus laudos</button>
+    <button data-v="evolucao"><svg class="i"><use href="#i-graf"/></svg>Evolução</button>
   </nav>
-</header>
-<div class="faixa-aviso">Conteúdo educativo. Não substitui a consulta, o diagnóstico ou o tratamento do seu médico.</div>
+</div></header>
 
 <main>
+<!-- INÍCIO -->
 <section id="v-inicio" hidden>
-  <div class="card estreito col">
-    <h2>Entenda o resultado dos seus exames</h2>
-    <p class="sub">Envie o laudo do laboratório (PDF ou foto). O SeuLaudo lê os valores, você confere e recebe uma explicação em linguagem simples, com perguntas para levar ao médico.</p>
-    <div class="linha">
-      <label>Data de nascimento <input id="pNasc" placeholder="DD/MM/AAAA" inputmode="numeric"></label>
-      <label>Sexo <select id="pSexo"><option value=""></option><option value="F">Feminino</option><option value="M">Masculino</option></select></label>
+  <div class="hero">
+    <div class="col">
+      <h1>Entenda seus exames sem complicação</h1>
+      <p class="sub" style="font-size:18px">Envie o laudo do laboratório e receba uma explicação clara de cada resultado, com perguntas para levar ao seu médico.</p>
+      <div class="etapas">
+        <div class="etapa"><b><svg class="i"><use href="#i-up"/></svg></b><div><strong>Envie</strong><p class="sub pq">PDF do laboratório ou foto do laudo.</p></div></div>
+        <div class="etapa"><b><svg class="i"><use href="#i-ok"/></svg></b><div><strong>Confira</strong><p class="sub pq">Veja se os valores foram lidos certinho.</p></div></div>
+        <div class="etapa"><b><svg class="i"><use href="#i-brilho"/></svg></b><div><strong>Entenda</strong><p class="sub pq">O que cada exame mede e o que conversar com o médico.</p></div></div>
+      </div>
     </div>
+    <div class="ilustra" aria-hidden="true">
+      <div class="folha">
+        <div class="lin" style="justify-content:space-between"><strong>Glicose</strong><span class="selo alto">▲ Acima</span></div>
+        <div style="font-size:26px;font-weight:800;margin:4px 0">112 <small style="font-size:14px;color:var(--sub)">mg/dL</small></div>
+        <div class="regua"><div class="trilho"></div><div class="ref" style="left:25%;width:40%"></div><div class="marc" style="left:78%;background:var(--fora)"></div><span class="lim" style="left:25%">70</span><span class="lim" style="left:65%">99</span></div>
+      </div>
+      <div class="folha">
+        <div class="lin" style="justify-content:space-between"><strong>Hemoglobina</strong><span class="selo normal">✓ Normal</span></div>
+        <div style="font-size:26px;font-weight:800;margin:4px 0">13,8 <small style="font-size:14px;color:var(--sub)">g/dL</small></div>
+        <div class="regua"><div class="trilho"></div><div class="ref" style="left:22%;width:50%"></div><div class="marc" style="left:44%;background:var(--ok)"></div><span class="lim" style="left:22%">12</span><span class="lim" style="left:72%">16</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card estreito col" style="margin-top:28px">
+    <h3>Antes de começar</h3>
+    <div class="grade2">
+      <label class="campo">Data de nascimento <input id="pNasc" placeholder="DD/MM/AAAA" inputmode="numeric" autocomplete="bday"></label>
+      <label class="campo">Sexo <select id="pSexo"><option value="">Prefiro não informar</option><option value="F">Feminino</option><option value="M">Masculino</option></select></label>
+    </div>
+    <p class="sub pq" style="margin-top:-6px">Ajudam a escolher a faixa de referência certa quando o laudo traz mais de uma.</p>
     <div class="termo">
-      <strong>Uso dos seus dados de saúde</strong>
+      <strong style="display:flex;gap:8px;align-items:center"><svg class="i"><use href="#i-escudo"/></svg>Seus dados de saúde</strong>
       <ul>
-        <li>Laudos são dados de saúde, considerados <em>dados sensíveis</em> pela LGPD.</li>
-        <li>Nesta prévia, os resultados ficam guardados apenas neste navegador. Você pode apagar tudo em "Meus laudos".</li>
-        <li>Para ler e explicar o laudo, as imagens e os valores são enviados ao Claude pela sua conta do claude.ai. O nome não é enviado no pedido de explicação.</li>
+        <li>Laudos são dados sensíveis pela LGPD. Nesta prévia, ficam guardados só neste navegador, e você pode apagar tudo quando quiser.</li>
+        <li>Para ler e explicar o laudo, as imagens e os valores são enviados ao Claude pela sua conta do claude.ai. O seu nome não vai no pedido de explicação.</li>
         <li>A explicação é educativa: não é diagnóstico e não substitui o seu médico.</li>
       </ul>
-      <label class="check"><input type="checkbox" id="pAceite"> Li e concordo com o uso dos meus dados de saúde para essas finalidades.</label>
     </div>
-    <div><button class="pri" id="bComecar">Começar</button></div>
+    <label class="check"><input type="checkbox" id="pAceite"><span>Li e concordo com o uso dos meus dados de saúde para essas finalidades.</span></label>
+    <button class="btn pri grande" id="bComecar">Começar <svg class="i"><use href="#i-seta"/></svg></button>
   </div>
 </section>
 
+<!-- ENVIAR -->
 <section id="v-enviar" hidden>
+  <div class="passos" data-passo="1"></div>
   <form id="fEnv" class="card estreito col">
-    <h2>Enviar laudo</h2>
-    <div id="drop">
-      <div class="botoes">
-        <label class="btnf pri">Escolher arquivo<input type="file" id="arq" accept="image/*,application/pdf,text/plain"></label>
-        <label class="btnf">Tirar foto<input type="file" id="cam" accept="image/*" capture="environment"></label>
+    <div id="envForm" class="col">
+      <div><h2>Envie seu laudo</h2><p class="sub">PDF do laboratório ou foto nítida, com todas as páginas.</p></div>
+      <div class="drop" id="drop">
+        <div class="bola"><svg class="i"><use href="#i-doc"/></svg></div>
+        <div><strong style="font-size:18px">Escolha o arquivo do laudo</strong><p class="sub pq">No computador, você também pode arrastar o arquivo para cá ou colar uma imagem.</p></div>
+        <div class="lin" style="justify-content:center">
+          <label class="btn pri btnf"><svg class="i"><use href="#i-up"/></svg>Escolher arquivo<input type="file" id="arq" accept="image/*,application/pdf,text/plain"></label>
+          <label class="btn btnf"><svg class="i"><use href="#i-cam"/></svg>Tirar foto<input type="file" id="cam" accept="image/*" capture="environment"></label>
+        </div>
+        <div id="escolhido" hidden></div>
       </div>
-      <p class="sub pequeno">PDF do laboratório ou foto do laudo, com boa luz e sem reflexo. No computador, arraste o arquivo para cá ou cole uma imagem.</p>
-      <p id="nomeArq" style="font-weight:600;color:var(--serie)"></p>
-      <img id="mini" alt="Laudo selecionado" hidden>
+      <div class="mais">
+        <button type="button" class="btn texto" id="bColar">Colar o texto do laudo</button>
+        <button type="button" class="btn texto" id="bEx">Testar com um laudo de exemplo</button>
+      </div>
+      <textarea id="txt" rows="7" placeholder="Glicose ....: 105 mg/dL   VR: 70 a 99 mg/dL" hidden></textarea>
+      <details class="det"><summary>Mais opções</summary>
+        <label class="chave"><span><strong>Ler sem IA</strong><br><span class="sub pq">Só para texto e PDF digital. Mais simples, mas não lê fotos.</span></span><input type="checkbox" id="semIA" role="switch"></label>
+      </details>
+      <div id="avisoClaude"></div>
+      <div id="msgEnv"></div>
+      <button type="submit" class="btn pri grande" id="bLer">Ler laudo <svg class="i"><use href="#i-seta"/></svg></button>
     </div>
-    <details id="detTexto"><summary>…ou colar o texto do laudo</summary>
-      <textarea id="txt" rows="8" placeholder="Glicose ....: 105 mg/dL   VR: 70 a 99 mg/dL"></textarea>
-      <button type="button" class="mini" id="bEx" style="margin-top:8px">Usar laudo de exemplo</button>
-    </details>
-    <div class="modos">
-      <label><input type="radio" name="modo" value="claude" checked><span><b>Leitura com Claude</b><span class="sub pequeno">PDF, foto ou texto. Lê laudos de imagem também.</span></span></label>
-      <label><input type="radio" name="modo" value="regras"><span><b>Leitura por regras</b><span class="sub pequeno">Sem IA. Só texto e PDF digital.</span></span></label>
-    </div>
-    <div id="avisoClaude"></div>
-    <div id="msgEnv"></div>
-    <div class="acoes" style="margin-top:0">
-      <button type="submit" class="pri" id="bLer">Ler laudo</button>
-      <button type="button" id="bParar" hidden>Parar</button>
-      <span id="lendo" class="sub"></span>
+    <div id="envCarregando" class="carregando" hidden>
+      <div class="pulso"><svg class="i"><use href="#i-doc"/></svg></div>
+      <div><strong id="etapaLeitura" style="font-size:18px">Abrindo o documento…</strong><p class="sub pq">Isso pode levar até um minuto.</p></div>
+      <div class="barra-prog"><i></i></div>
+      <button type="button" class="btn peq" id="bParar">Cancelar</button>
     </div>
   </form>
 </section>
 
+<!-- CONFERIR -->
 <section id="v-conferir" hidden>
+  <div class="passos" data-passo="2"></div>
+  <div class="segm so-cel" id="segConf"><button type="button" data-p="res" class="ativo">Valores lidos</button><button type="button" data-p="doc">Documento</button></div>
   <div class="dividido">
-    <div class="card doc"><strong>Documento enviado</strong><div id="docPrev" style="margin-top:8px"></div></div>
-    <form id="fConf" class="card">
-      <h2>Confira a leitura</h2>
-      <p class="sub">Compare com o documento e corrija o que estiver diferente. Campos lidos com dúvida aparecem em amarelo. A explicação usa exatamente estes valores.</p>
+    <div class="card doc" id="painelDoc"><h3>Seu documento</h3><div class="docprev" id="docPrev"></div></div>
+    <form id="fConf" class="card" novalidate>
+      <h2>Confira os valores</h2>
+      <p class="sub" id="confSub"></p>
       <div id="alertasLeitura"></div>
-      <div class="grade">
-        <label>Tipo <select data-c="tipo"><option value="laboratorial">Exames laboratoriais</option><option value="imagem">Exame de imagem</option><option value="outro">Outro laudo descritivo</option></select></label>
-        <label>Data da coleta <input data-c="data_coleta" placeholder="DD/MM/AAAA"></label>
-        <label>Laboratório / clínica <input data-c="laboratorio"></label>
-        <label>Sexo <select data-c="paciente.sexo"><option value=""></option><option value="F">Feminino</option><option value="M">Masculino</option></select></label>
-        <label>Idade <input data-c="paciente.idade"></label>
+      <div class="res-lista" id="resLista"></div>
+      <button type="button" class="btn texto" id="bAdd" style="margin-top:6px">+ Adicionar um resultado que faltou</button>
+      <div id="blocoDesc" class="col" style="margin-top:12px">
+        <h3>Texto do laudo</h3>
+        <label class="campo">Exame <input data-c="titulo_exame"></label>
+        <label class="campo">Achados <textarea data-c="achados" rows="5"></textarea></label>
+        <label class="campo">Conclusão <textarea data-c="conclusao" rows="3"></textarea></label>
       </div>
-      <h3>Resultados</h3>
-      <div class="scroll"><table id="tabRes"><thead><tr><th>Exame</th><th>Resultado</th><th>Unidade</th><th>Referência</th><th>Situação</th><th></th></tr></thead><tbody></tbody></table></div>
-      <button type="button" class="mini" id="bAdd" style="margin-top:8px">+ Adicionar resultado</button>
-      <div id="blocoDesc">
-        <h3>Laudo descritivo</h3>
-        <div class="col">
-          <label>Exame <input data-c="titulo_exame"></label>
-          <label>Achados <textarea data-c="achados" rows="5"></textarea></label>
-          <label>Conclusão <textarea data-c="conclusao" rows="3"></textarea></label>
+      <details class="det"><summary>Dados do laudo</summary>
+        <div class="grade2" style="padding-bottom:6px">
+          <label class="campo">Data da coleta <input data-c="data_coleta" placeholder="DD/MM/AAAA"></label>
+          <label class="campo">Laboratório ou clínica <input data-c="laboratorio"></label>
+          <label class="campo">Tipo <select data-c="tipo"><option value="laboratorial">Exames de laboratório</option><option value="imagem">Exame de imagem</option><option value="outro">Outro laudo descritivo</option></select></label>
+          <label class="campo">Sexo <select data-c="paciente.sexo"><option value="">Não informado</option><option value="F">Feminino</option><option value="M">Masculino</option></select></label>
+          <label class="campo">Idade <input data-c="paciente.idade"></label>
         </div>
+      </details>
+      <div id="msgConf"></div>
+      <div class="barra-fixa">
+        <button type="submit" class="btn pri grande" id="bInterp" style="flex:1 1 220px"><svg class="i"><use href="#i-brilho"/></svg>Tudo certo, explicar</button>
+        <button type="button" class="btn" id="bBasico">Explicação sem IA</button>
       </div>
-      <div class="acoes">
-        <button type="submit" class="pri" id="bInterp">Salvar e explicar com Claude</button>
-        <button type="button" id="bBasico">Explicação básica (sem IA)</button>
-        <span id="interpretando" class="sub"></span>
-      </div>
-      <div id="msgConf" style="margin-top:10px"></div>
     </form>
+  </div>
+  <div id="confCarregando" class="card estreito carregando" hidden>
+    <div class="pulso"><svg class="i"><use href="#i-brilho"/></svg></div>
+    <div><strong id="etapaInterp" style="font-size:18px">Preparando a explicação…</strong><p class="sub pq">Isso pode levar até um minuto.</p></div>
+    <div class="barra-prog"><i></i></div>
   </div>
 </section>
 
-<section id="v-laudo" hidden><article class="card estreito" id="relatorio" style="max-width:880px"></article></section>
+<!-- LAUDO EXPLICADO -->
+<section id="v-laudo" hidden><div class="passos" data-passo="3" id="passosLaudo"></div><article class="card" id="relatorio" style="max-width:1000px;margin:0 auto"></article></section>
 
+<!-- MEUS LAUDOS -->
 <section id="v-laudos" hidden>
-  <div class="card estreito col" style="max-width:880px">
-    <div class="linha" style="justify-content:space-between"><h2>Meus laudos</h2><button class="pri" data-ir="enviar">Enviar novo laudo</button></div>
-    <div id="lista"></div>
-    <details><summary>Apagar meus dados</summary>
-      <p class="sub">Apaga todos os laudos, explicações e o histórico guardados neste navegador.</p>
-      <button class="perigo" id="bApagar">Apagar tudo</button>
+  <div class="estreito col" style="max-width:820px">
+    <div class="lin" style="justify-content:space-between"><h2>Meus laudos</h2><button class="btn pri" data-ir="enviar"><svg class="i"><use href="#i-up"/></svg>Enviar laudo</button></div>
+    <div id="lista" class="lista-laudos"></div>
+    <details class="det"><summary>Privacidade e dados</summary>
+      <p class="sub pq">Seus laudos ficam guardados só neste navegador. Apagar remove todos os laudos, explicações e o histórico.</p>
+      <button class="btn perigo" id="bApagar"><svg class="i"><use href="#i-lixo"/></svg>Apagar todos os meus dados</button>
     </details>
   </div>
 </section>
 
+<!-- EVOLUÇÃO -->
 <section id="v-evolucao" hidden>
-  <div class="card col">
-    <h2>Evolução dos seus exames</h2>
-    <p class="sub">Cada gráfico junta o mesmo exame de laudos diferentes, mesmo de laboratórios diferentes. A faixa verde é a referência do laboratório; pontos em vermelho ficaram fora dela. Só entram no gráfico valores com a mesma unidade.</p>
-    <label style="max-width:380px">Mostrar <select id="filtroEv"><option value="todos">Todos os exames</option><option value="fora">Só os que já vieram fora da referência</option></select></label>
-    <div id="graficos"></div>
+  <div class="col">
+    <div><h2>Evolução dos seus exames</h2><p class="sub">O mesmo exame de laudos diferentes, lado a lado. A faixa verde é a referência do laboratório; pontos em coral ficaram fora dela.</p></div>
+    <div class="lin">
+      <div class="busca"><svg class="i"><use href="#i-lupa"/></svg><input id="buscaEv" placeholder="Buscar exame (ex.: glicose)" aria-label="Buscar exame"></div>
+      <div class="lin" id="filtroEv"><button class="chip ativo" data-f="todos">Todos</button><button class="chip" data-f="fora">Já vieram fora</button></div>
+    </div>
+    <div id="graficos" class="graficos"></div>
   </div>
 </section>
+
+<p class="educ"><svg class="i" style="width:18px;height:18px"><use href="#i-escudo"/></svg>Conteúdo educativo. Não substitui a consulta, o diagnóstico ou o tratamento do seu médico.</p>
 </main>
 <div id="tip" hidden></div>
-<div id="toast" hidden></div>
-
+<div id="toast" hidden role="status"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
 <script>
@@ -365,11 +538,11 @@ let sample = null, limites = null, claudeChecado = false;
 })();
 setTimeout(() => { claudeChecado = true; avisoClaude(); }, 11000);
 function avisoClaude() {
-  const el = $("#avisoClaude"), modo = $("input[name=modo]:checked").value;
+  const el = $("#avisoClaude"), modo = modoAtual();
   let m = "";
   if (modo === "claude") {
-    if (!window.claude) m = "Abra esta página no claude.ai para usar a leitura com Claude.";
-    else if (claudeChecado && !sample) m = "A leitura com Claude não está disponível nesta visualização. Use a leitura por regras.";
+    if (!window.claude) m = "Abra esta página no claude.ai para ler o laudo com IA.";
+    else if (claudeChecado && !sample) m = "A leitura com IA não está disponível nesta visualização. Use a opção Ler sem IA em Mais opções.";
     else if (sample && limites && !limites.images) m = "Envio de imagens ao Claude indisponível aqui: só texto colado ou PDF digital.";
   }
   el.innerHTML = m ? `<div class="aviso">${esc(m)}</div>` : "";
@@ -417,35 +590,60 @@ async function pdfTexto(buf) {
 const lerDataURL = f => new Promise((ok, err) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = err; r.readAsDataURL(f); });
 
 /* ---------------- estado ---------------- */
-let LAUDOS = store.get("laudos", []), atual = null, previas = {};
+function modoAtual() { return $("#semIA").checked ? "regras" : "claude"; }
+let LAUDOS = store.get("laudos", []), atual = null, previas = {}, filtroLaudo = "atencao", recem = false;
 const salvar = () => { if (!store.set("laudos", LAUDOS)) toast("Não foi possível guardar neste navegador; os dados valem só até fechar a página.", 6000); };
 const proxId = () => LAUDOS.reduce((m, l) => Math.max(m, l.id), 0) + 1;
 const perfil = () => store.get("perfil", null);
+const ic = (n, s = "") => `<svg class="i" ${s}><use href="#i-${n}"/></svg>`;
+
+const PASSOS = ["Enviar", "Conferir", "Entender"];
+$$(".passos").forEach(el => {
+  const n = +el.dataset.passo;
+  el.innerHTML = PASSOS.map((p, i) => `${i ? "<hr>" : ""}<span class="${i + 1 < n ? "feito" : i + 1 === n ? "agora" : ""}"><i>${i + 1 < n ? "✓" : i + 1}</i>${p}</span>`).join("");
+});
 
 function mostrar(v) {
   if (!perfil()?.aceite) v = "inicio";
   $$("main > section").forEach(s => s.hidden = s.id !== "v-" + v);
-  $$("nav button").forEach(b => b.classList.toggle("ativo", b.dataset.v === v));
+  const aba = { conferir: "enviar", laudo: "laudos" }[v] || v;
+  $$("#abas button").forEach(b => b.classList.toggle("ativo", b.dataset.v === aba));
+  $("#abas").hidden = v === "inicio";
   window.scrollTo(0, 0);
   if (v === "laudos") desenharLista();
   if (v === "evolucao") desenharEvolucao();
 }
-$$("nav button").forEach(b => b.addEventListener("click", () => mostrar(b.dataset.v)));
+$$("#abas button").forEach(b => b.addEventListener("click", () => mostrar(b.dataset.v)));
 $$("[data-ir]").forEach(b => b.addEventListener("click", () => mostrar(b.dataset.ir)));
 $("#bComecar").addEventListener("click", () => {
-  if (!$("#pAceite").checked) return toast("Para continuar, aceite o termo de uso dos dados.");
+  if (!$("#pAceite").checked) { toast("Para continuar, marque que concorda com o uso dos dados."); $("#pAceite").focus(); return; }
   store.set("perfil", { aceite: new Date().toISOString(), nasc: $("#pNasc").value.trim(), sexo: $("#pSexo").value });
   mostrar("enviar");
 });
+
+/* etapas animadas enquanto o Claude trabalha */
+function etapas(el, textos) {
+  let i = 0; el.textContent = textos[0];
+  const h = setInterval(() => { i = Math.min(i + 1, textos.length - 1); el.textContent = textos[i]; }, 5000);
+  return () => clearInterval(h);
+}
 
 /* ---------------- envio ---------------- */
 let arquivo = null, miniURL = null, ctl = null;
 function selecionar(f) {
   arquivo = f || null;
-  $("#nomeArq").textContent = f ? `${f.name || "imagem colada"} · ${Math.max(1, Math.round(f.size / 1024))} KB` : "";
   if (miniURL) URL.revokeObjectURL(miniURL);
   miniURL = f && f.type.startsWith("image/") ? URL.createObjectURL(f) : null;
-  $("#mini").hidden = !miniURL; if (miniURL) $("#mini").src = miniURL;
+  const el = $("#escolhido");
+  el.hidden = !f;
+  if (f) {
+    el.className = "escolhido";
+    el.innerHTML = `${miniURL ? `<img src="${miniURL}" alt="">` : `<span class="ic">${ic("doc")}</span>`}
+      <div style="flex:1"><strong>${esc(f.name || "imagem colada")}</strong><div class="sub pq">${Math.max(1, Math.round(f.size / 1024))} KB · pronto para ler</div></div>
+      <button type="button" class="btn peq" id="bTirar" aria-label="Remover arquivo">✕</button>`;
+    $("#bTirar").addEventListener("click", () => selecionar(null));
+    $("#txt").hidden = true;
+  }
 }
 for (const id of ["#arq", "#cam"]) $(id).addEventListener("change", e => { selecionar(e.target.files[0]); e.target.value = ""; });
 const drop = $("#drop");
@@ -457,18 +655,21 @@ document.addEventListener("paste", ev => {
   const it = [...(ev.clipboardData?.items || [])].find(i => i.kind === "file" && i.type.startsWith("image/"));
   if (it) { ev.preventDefault(); const f = it.getAsFile(); selecionar(new File([f], "imagem-colada.png", { type: f.type })); }
 });
-$$("input[name=modo]").forEach(r => r.addEventListener("change", avisoClaude));
-$("#bEx").addEventListener("click", () => { $("#txt").value = EXEMPLO; selecionar(null); $("input[name=modo][value=regras]").checked = true; avisoClaude(); });
+$("#bColar").addEventListener("click", () => { const t = $("#txt"); t.hidden = !t.hidden; if (!t.hidden) { selecionar(null); t.focus(); } });
+$("#bEx").addEventListener("click", () => { selecionar(null); $("#txt").hidden = false; $("#txt").value = EXEMPLO; $("#semIA").checked = true; avisoClaude(); toast("Laudo de exemplo carregado. Toque em Ler laudo."); });
+$("#semIA").addEventListener("change", avisoClaude);
 $("#bParar").addEventListener("click", () => ctl?.abort());
 
+function carregandoEnvio(sim) { $("#envForm").hidden = sim; $("#envCarregando").hidden = !sim; }
 $("#fEnv").addEventListener("submit", async ev => {
   ev.preventDefault();
-  const modo = $("input[name=modo]:checked").value, f = arquivo, texto = $("#txt").value.trim(), msg = $("#msgEnv");
+  const modo = modoAtual(), f = arquivo, texto = $("#txt").hidden ? "" : $("#txt").value.trim(), msg = $("#msgEnv");
   msg.innerHTML = "";
   if (!f && !texto) { msg.innerHTML = `<div class="aviso erro">Escolha um arquivo, tire uma foto ou cole o texto do laudo.</div>`; return; }
   const l = { id: proxId(), criado: new Date().toISOString(), arquivo: f ? (f.name || "imagem") : "texto colado", modo, status: "lido" };
   let previa = null;
-  $("#bLer").disabled = true; $("#lendo").innerHTML = `<span class="spin"></span>Lendo o laudo… pode levar até um minuto.`;
+  carregandoEnvio(true);
+  const parar = etapas($("#etapaLeitura"), modo === "regras" ? ["Lendo o texto…"] : ["Abrindo o documento…", "Lendo os valores…", "Identificando os exames…", "Conferindo as referências…", "Quase pronto…"]);
   try {
     let d;
     if (modo === "regras") {
@@ -476,16 +677,16 @@ $("#fEnv").addEventListener("submit", async ev => {
       if (f) {
         if (f.type === "application/pdf") t = await pdfTexto(await f.arrayBuffer());
         else if (f.type.startsWith("text/")) t = await f.text();
-        else throw new Error("A leitura por regras só lê texto e PDF digital. Para fotos, use a leitura com Claude.");
-        if (t.trim().length < 20) throw new Error("O PDF não tem texto (é digitalizado). Use a leitura com Claude.");
+        else throw new Error("A leitura sem IA só lê texto e PDF digital. Para fotos, desligue a opção \"Ler sem IA\".");
+        if (t.trim().length < 20) throw new Error("O PDF não tem texto (é digitalizado). Desligue a opção \"Ler sem IA\".");
       }
       previa = { tipo: "texto", t }; d = lerTexto(t);
     } else {
-      if (!sample) throw new Error(window.claude ? "Leitura com Claude indisponível nesta visualização." : "Abra esta página no claude.ai para usar a leitura com Claude.");
+      if (!sample) throw new Error(window.claude ? "A leitura com IA não está disponível nesta visualização." : "Abra esta página no claude.ai para ler o laudo com IA.");
       let imgs = null, extra = "";
       if (f && (f.type === "application/pdf" || f.type.startsWith("image/"))) {
         if (!limites?.images) {
-          if (f.type !== "application/pdf") throw new Error("Envio de imagens ao Claude indisponível aqui. Cole o texto do laudo.");
+          if (f.type !== "application/pdf") throw new Error("Envio de imagens indisponível aqui. Cole o texto do laudo.");
           const t = await pdfTexto(await f.arrayBuffer());
           if (t.trim().length < 20) throw new Error("Este PDF é digitalizado e o envio de imagens está indisponível aqui.");
           previa = { tipo: "texto", t }; extra = `\n\nTexto extraído do PDF do laudo:\n${t.slice(0, 40000)}`;
@@ -499,7 +700,7 @@ $("#fEnv").addEventListener("submit", async ev => {
       } else if (f && f.type.startsWith("text/")) { const t = await f.text(); previa = { tipo: "texto", t }; extra = `\n\nConteúdo do laudo:\n${t.slice(0, 40000)}`; }
       else if (f) throw new Error("Formato não suportado. Envie PDF, JPG, PNG ou WEBP.");
       else { previa = { tipo: "texto", t: texto }; extra = `\n\nConteúdo do laudo:\n${texto.slice(0, 40000)}`; }
-      ctl = new AbortController(); $("#bParar").hidden = false;
+      ctl = new AbortController();
       const x = await sample.json(`${PROMPT_LEITURA}\nResponda apenas com um objeto JSON neste formato:\n${FORMATO_LEITURA}${extra}`, { images: imgs || undefined, signal: ctl.signal, modelTier: "complex" });
       d = completarLeitura(x);
     }
@@ -507,12 +708,13 @@ $("#fEnv").addEventListener("submit", async ev => {
     d.paciente.sexo ||= p.sexo || ""; d.paciente.data_nascimento ||= p.nasc || "";
     l.dados = processar(d);
   } catch (e) {
-    if (e?.code === "cancelled" || e?.name === "AbortError") { msg.innerHTML = `<div class="aviso">Leitura interrompida.</div>`; return; }
-    msg.innerHTML = `<div class="aviso erro">${esc(msgErro(e))}</div>`; return;
-  } finally { $("#bLer").disabled = false; $("#lendo").textContent = ""; $("#bParar").hidden = true; ctl = null; }
+    if (e?.code === "cancelled" || e?.name === "AbortError") msg.innerHTML = `<div class="aviso">Leitura cancelada.</div>`;
+    else msg.innerHTML = `<div class="aviso erro">${esc(msgErro(e))}</div>`;
+    return;
+  } finally { parar(); carregandoEnvio(false); ctl = null; }
   previas[l.id] = previa;
   LAUDOS.unshift(l); salvar();
-  $("#fEnv").reset(); $("#txt").value = ""; selecionar(null); avisoClaude();
+  $("#txt").value = ""; $("#txt").hidden = true; selecionar(null);
   atual = l; mostrarConferencia();
 });
 
@@ -522,47 +724,88 @@ const CURTO = { normal: "✓ Normal", alto: "▲ Alto", baixo: "▼ Baixo", alte
 const selo = (r, curto) => r.critico ? `<span class="selo critico">! ${curto ? "Crítico" : "Valor crítico"}</span>` : r.situacao ? `<span class="selo ${r.situacao}">${(curto ? CURTO : SELO)[r.situacao]}</span>` : "";
 const getP = (o, p) => p.split(".").reduce((a, k) => a?.[k], o);
 const setP = (o, p, v) => { const ks = p.split("."), u = ks.pop(); ks.reduce((a, k) => a[k] ??= {}, o)[u] = v; };
+let incertos = new Set(), abertos = new Set();
 
 function mostrarConferencia() {
-  const d = atual.dados, inc = new Set(d.campos_incertos || []), pv = previas[atual.id];
-  $("#docPrev").innerHTML = !pv ? `<p class="sub" style="padding:12px">A imagem do documento não fica guardada depois que a página é fechada. Confira com o laudo original.</p>`
+  const d = atual.dados, pv = previas[atual.id];
+  incertos = new Set(d.campos_incertos || []); abertos = new Set();
+  $("#docPrev").innerHTML = !pv ? `<p class="sub" style="padding:14px">A imagem do documento não fica guardada depois que a página é fechada. Confira com o laudo original.</p>`
     : pv.tipo === "img" ? pv.urls.map((u, i) => `<img src="${u}" alt="Página ${i + 1} do laudo">`).join("") : `<pre>${esc(pv.t)}</pre>`;
   $$("#docPrev img").forEach(i => i.addEventListener("click", () => i.classList.toggle("zoom")));
-  $$("#fConf [data-c]").forEach(el => { el.value = getP(d, el.dataset.c) ?? ""; el.classList.toggle("incerto", inc.has(el.dataset.c)); });
+  $$("#fConf [data-c]").forEach(el => { el.value = getP(d, el.dataset.c) ?? ""; el.classList.toggle("incerto", incertos.has(el.dataset.c)); });
   const al = [...(d.alertas_leitura || [])];
   if (d.legibilidade === "ruim") al.unshift("A imagem estava difícil de ler. Confira cada valor ou envie uma foto melhor.");
-  $("#alertasLeitura").innerHTML = al.length ? `<div class="aviso"><strong>Confira:</strong><ul>${al.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>` : "";
-  desenharTabela(d.resultados, inc);
+  $("#alertasLeitura").innerHTML = al.length ? `<div class="aviso" style="margin-top:12px"><strong>Atenção:</strong><ul>${al.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>` : "";
+  desenharLista2();
   $("#blocoDesc").hidden = d.tipo === "laboratorial" && !d.conclusao && !d.achados;
   $("#msgConf").innerHTML = "";
+  segmento("res");
+  $("#fConf").hidden = false; $("#confCarregando").hidden = true; $(".dividido").hidden = false;
   mostrar("conferir");
 }
-function desenharTabela(res, inc = new Set()) {
-  const c = (i, k) => inc.has(`resultados[${i}].${k}`) || inc.has(`resultados[${i}]`) ? "incerto" : "";
-  $("#tabRes tbody").innerHTML = res.map((r, i) => `<tr data-i="${i}">
-    <td><input data-r="analito" value="${esc(r.analito)}" class="${c(i, "analito")}" aria-label="Exame"><small>${esc(r.exame && r.exame !== r.analito ? r.exame : "")}${r.nome_padrao && normalizar(r.nome_padrao) !== normalizar(r.analito) ? ` → ${esc(r.nome_padrao)}` : ""}</small></td>
-    <td><input data-r="valor" value="${esc(r.valor)}" class="${c(i, "valor")}" aria-label="Resultado"></td>
-    <td><input data-r="unidade" value="${esc(r.unidade)}" class="${c(i, "unidade")}" aria-label="Unidade"></td>
-    <td><input data-r="referencia" value="${esc(r.referencia)}" class="${c(i, "referencia")}" aria-label="Referência"></td>
-    <td>${selo(r, true)}</td><td><button type="button" class="mini" data-rm aria-label="Remover linha">✕</button></td></tr>`).join("")
-    || `<tr><td colspan="6" class="sub">Nenhum resultado numérico. Em laudos de imagem, confira o texto abaixo.</td></tr>`;
-  $$("[data-rm]").forEach(b => b.addEventListener("click", () => { const d = coletar(); d.resultados.splice(+b.closest("tr").dataset.i, 1); atual.dados = processar(d); desenharTabela(d.resultados); }));
-  $$("#tabRes input").forEach(i => i.addEventListener("change", () => { const d = coletar(); atual.dados = processar(d); desenharTabela(d.resultados); }));
+function segmento(p) {
+  $$("#segConf button").forEach(b => b.classList.toggle("ativo", b.dataset.p === p));
+  if (matchMedia("(max-width:900px)").matches) { $("#painelDoc").hidden = p !== "doc"; $("#fConf").hidden = p !== "res"; }
+  else { $("#painelDoc").hidden = false; $("#fConf").hidden = false; }
 }
+$$("#segConf button").forEach(b => b.addEventListener("click", () => segmento(b.dataset.p)));
+matchMedia("(max-width:900px)").addEventListener("change", () => { if (!$("#v-conferir").hidden) segmento($("#segConf .ativo")?.dataset.p || "res"); });
+
+function duvida(i) { return [...incertos].some(c => c === `resultados[${i}]` || c.startsWith(`resultados[${i}].`)); }
+function desenharLista2() {
+  const res = atual.dados.resultados, nd = res.filter((_, i) => duvida(i)).length;
+  $("#confSub").textContent = res.length
+    ? `${res.length} resultado${res.length > 1 ? "s" : ""} lido${res.length > 1 ? "s" : ""}. Toque em um resultado para corrigir.${nd ? ` ${nd} lido${nd > 1 ? "s" : ""} com dúvida, em amarelo.` : ""}`
+    : "Nenhum valor numérico neste laudo. Confira o texto abaixo.";
+  $("#resLista").innerHTML = res.map((r, i) => {
+    const c = k => incertos.has(`resultados[${i}].${k}`) || incertos.has(`resultados[${i}]`) ? "incerto" : "";
+    const aberto = abertos.has(i);
+    return `<div class="res ${duvida(i) ? "duvida" : ""}" data-i="${i}">
+      <button type="button" class="res-topo" aria-expanded="${aberto}">
+        <span class="nome"><strong>${esc(r.analito || "Novo resultado")}</strong><small>${r.nome_padrao && normalizar(r.nome_padrao) !== normalizar(r.analito) ? `${esc(r.nome_padrao)} · ` : ""}ref. ${esc(r.referencia || "não informada")}</small></span>
+        <span class="val"><strong>${esc(r.valor)}</strong> <span class="sub pq">${esc(r.unidade)}</span><small>${selo(r, true)}</small></span>
+        ${ic(aberto ? "baixo" : "lapis")}
+      </button>
+      ${aberto ? `<div class="res-edit">
+        <label class="campo larga">Exame <input data-r="analito" value="${esc(r.analito)}" class="${c("analito")}"></label>
+        <label class="campo">Resultado <input data-r="valor" value="${esc(r.valor)}" class="${c("valor")}" inputmode="decimal"></label>
+        <label class="campo">Unidade <input data-r="unidade" value="${esc(r.unidade)}" class="${c("unidade")}"></label>
+        <label class="campo larga">Valor de referência <input data-r="referencia" value="${esc(r.referencia)}" class="${c("referencia")}"></label>
+        <div class="lin larga" style="justify-content:space-between"><button type="button" class="btn peq perigo" data-rm>${ic("lixo", 'style="width:18px;height:18px"')}Remover</button><button type="button" class="btn peq pri" data-ok>Pronto</button></div>
+      </div>` : ""}
+    </div>`;
+  }).join("");
+  $$("#resLista .res").forEach(el => {
+    const i = +el.dataset.i;
+    el.querySelector(".res-topo").addEventListener("click", () => { abertos.has(i) ? abertos.delete(i) : abertos.add(i); desenharLista2(); if (abertos.has(i)) $(`#resLista .res[data-i="${i}"] input`)?.focus(); });
+    $$("[data-r]", el).forEach(inp => inp.addEventListener("change", () => {
+      const r = atual.dados.resultados[i], k = inp.dataset.r, v = inp.value.trim();
+      if (k === "referencia" && v !== r.referencia) { r.ref_min = null; r.ref_max = null; }
+      r[k] = v; incertos.delete(`resultados[${i}].${k}`);
+      padronizar(classificar(r));
+      const topo = el.querySelector(".res-topo .val"); topo.innerHTML = `<strong>${esc(r.valor)}</strong> <span class="sub pq">${esc(r.unidade)}</span><small>${selo(r, true)}</small>`;
+    }));
+    el.querySelector("[data-ok]")?.addEventListener("click", () => { abertos.delete(i); [...incertos].filter(c => c.startsWith(`resultados[${i}]`)).forEach(c => incertos.delete(c)); desenharLista2(); });
+    el.querySelector("[data-rm]")?.addEventListener("click", () => {
+      atual.dados.resultados.splice(i, 1);
+      incertos = new Set([...incertos].filter(c => !c.startsWith(`resultados[${i}]`)).map(c => c.replace(/^resultados\[(\d+)\]/, (m, n) => +n > i ? `resultados[${n - 1}]` : m)));
+      abertos = new Set([...abertos].filter(x => x !== i).map(x => x > i ? x - 1 : x));
+      desenharLista2(); toast("Resultado removido.");
+    });
+  });
+}
+$("#bAdd").addEventListener("click", () => {
+  const r = atual.dados.resultados; r.push({ exame: "", analito: "", valor: "", unidade: "", referencia: "", ref_min: null, ref_max: null });
+  abertos.add(r.length - 1); desenharLista2(); $(`#resLista .res[data-i="${r.length - 1}"] input`)?.focus();
+});
+$("#fConf [data-c=tipo]").addEventListener("change", e => $("#blocoDesc").hidden = e.target.value === "laboratorial");
 function coletar() {
   const d = structuredClone(atual.dados);
   $$("#fConf [data-c]").forEach(el => setP(d, el.dataset.c, el.value.trim()));
-  d.resultados = $$("#tabRes tbody tr[data-i]").map(tr => {
-    const o = d.resultados[+tr.dataset.i] || {}, r = { ...o };
-    $$("[data-r]", tr).forEach(el => r[el.dataset.r] = el.value.trim());
-    if (r.referencia !== o.referencia) { r.ref_min = null; r.ref_max = null; }
-    return r;
-  }).filter(r => r.analito || r.valor);
+  d.resultados = d.resultados.filter(r => r.analito || r.valor);
   d.campos_incertos = [];
   return d;
 }
-$("#bAdd").addEventListener("click", () => { const d = coletar(); d.resultados.push({ exame: "", analito: "", valor: "", unidade: "", referencia: "", ref_min: null, ref_max: null }); atual.dados = d; desenharTabela(d.resultados); $("#tabRes tbody tr:last-child input").focus(); });
-$("#fConf [data-c=tipo]").addEventListener("change", e => $("#blocoDesc").hidden = e.target.value === "laboratorial");
 
 /* ---------------- interpretação ---------------- */
 const BASICO = {
@@ -583,7 +826,7 @@ function historicoAnterior(l) {
   return out;
 }
 function interpBasica(d, hist) {
-  const fora = d.resultados.filter(r => ["alto", "baixo", "alterado"].includes(r.situacao)).map(r => r.analito || r.nome_padrao);
+  const fora = d.resultados.filter(r => FORA(r.situacao)).map(r => r.analito || r.nome_padrao);
   const itens = d.resultados.map((r, i) => {
     let s = BASICO[r.situacao] || ""; const ant = hist[r.codigo];
     if (ant?.length) { const u = ant[ant.length - 1]; s += ` No exame anterior (${u.data}) o valor foi ${u.valor} ${u.unidade}.`; }
@@ -593,8 +836,8 @@ function interpBasica(d, hist) {
   const n = d.resultados.length;
   return {
     modo: "basico",
-    resumo: (fora.length ? `De ${n} resultados, ${fora.length} ficaram fora da faixa de referência do laboratório: ${fora.join(", ")}. Isso não significa necessariamente uma doença, mas vale conversar com seu médico sobre eles.`
-      : n ? `Os ${n} resultados deste laudo estão dentro das faixas de referência do laboratório.` : "Não há resultados numéricos neste laudo para comparar automaticamente.") + " (Explicação básica, sem IA.)",
+    resumo: fora.length ? `De ${n} resultados, ${fora.length} ficaram fora da faixa de referência do laboratório: ${fora.join(", ")}. Isso não significa necessariamente uma doença, mas vale conversar com seu médico sobre eles.`
+      : n ? `Os ${n} resultados deste laudo estão dentro das faixas de referência do laboratório.` : "Não há resultados numéricos neste laudo para comparar automaticamente.",
     itens, perguntas_medico: fora.length ? ["Algum destes resultados precisa de tratamento ou de novos exames?", "Quando devo repetir os exames que vieram fora da referência?", "Algum medicamento que uso pode ter interferido nos resultados?", "Há algo que eu possa mudar na alimentação ou nos hábitos para melhorar estes valores?"] : ["Algum medicamento que uso pode ter interferido nos resultados?"],
     exames_para_conversar: [], habitos: [], procurar_atendimento: [],
     acompanhamento: "A frequência de repetição dos exames depende do seu histórico e deve ser definida pelo seu médico."
@@ -603,14 +846,14 @@ function interpBasica(d, hist) {
 async function interpretar(basico) {
   const d = processar(coletar()); atual.dados = d;
   const hist = historicoAnterior(atual);
-  $("#bInterp").disabled = $("#bBasico").disabled = true;
-  $("#interpretando").innerHTML = basico ? "" : `<span class="spin"></span>Preparando a explicação…`;
   $("#msgConf").innerHTML = "";
+  let parar = () => {};
+  if (!basico) { $(".dividido").hidden = true; $("#segConf").hidden = true; $("#confCarregando").hidden = false; parar = etapas($("#etapaInterp"), ["Preparando a explicação…", "Olhando os resultados em conjunto…", "Escrevendo em linguagem simples…", "Separando perguntas para o médico…", "Quase pronto…"]); window.scrollTo(0, 0); }
   try {
     let it;
     if (basico) it = interpBasica(d, hist);
     else {
-      if (!sample) throw new Error(window.claude ? "Claude indisponível nesta visualização. Use a explicação básica." : "Abra esta página no claude.ai para a explicação com Claude.");
+      if (!sample) throw new Error(window.claude ? "A explicação com IA não está disponível nesta visualização. Use a explicação sem IA." : "Abra esta página no claude.ai para a explicação com IA.");
       const ent = structuredClone(d); delete ent.paciente.nome; delete ent.campos_incertos; delete ent.alertas_leitura; delete ent.legibilidade;
       for (const r of ent.resultados) { if (hist[r.codigo]) r.historico = hist[r.codigo]; delete r.valor_numerico; delete r.nome_padrao; delete r.mensagem_critica; }
       ctl = new AbortController();
@@ -627,23 +870,46 @@ async function interpretar(basico) {
     const crit = d.resultados.filter(r => r.critico).map(r => `${r.analito || r.nome_padrao}: ${r.valor} ${r.unidade}. ${r.mensagem_critica} Procure atendimento médico o quanto antes e leve este laudo.`);
     it.procurar_atendimento = [...crit, ...it.procurar_atendimento.filter(a => !crit.includes(a))];
     atual.interp = it; atual.status = "interpretado"; salvar();
+    filtroLaudo = d.resultados.some(r => FORA(r.situacao) || r.critico) ? "atencao" : "todos"; recem = true;
     mostrarLaudo();
   } catch (e) {
-    if (e?.code !== "cancelled") $("#msgConf").innerHTML = `<div class="aviso erro">${esc(msgErro(e))}</div>`;
-  } finally { $("#bInterp").disabled = $("#bBasico").disabled = false; $("#interpretando").textContent = ""; ctl = null; }
+    $(".dividido").hidden = false; $("#segConf").hidden = false; $("#confCarregando").hidden = true; segmento("res");
+    if (e?.code !== "cancelled") $("#msgConf").innerHTML = `<div class="aviso erro" style="margin-top:12px">${esc(msgErro(e))}</div>`;
+  } finally { parar(); ctl = null; }
 }
 $("#fConf").addEventListener("submit", e => { e.preventDefault(); interpretar(false); });
 $("#bBasico").addEventListener("click", () => interpretar(true));
 
+/* ---------------- laudo explicado ---------------- */
 const lista = xs => `<ul>${xs.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
 const FORA = s => ["alto", "baixo", "alterado"].includes(s);
+const fmt = v => v == null ? "" : Number(v).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+
+function regua(r) {
+  const v = r.valor_numerico, mn = r.ref_min ?? null, mx = r.ref_max ?? null;
+  if (v == null || (mn == null && mx == null)) return "";
+  let lo, hi;
+  if (mn != null && mx != null) { const s = (mx - mn) || Math.abs(mx) || 1; lo = mn - s * 0.6; hi = mx + s * 0.6; }
+  else if (mx != null) { lo = 0; hi = mx * 1.6 || 1; } else { lo = 0; hi = mn * 2 || 1; }
+  lo = Math.min(lo, v - (hi - lo) * 0.08); hi = Math.max(hi, v + (hi - lo) * 0.08); if (mn == null || mn >= 0) lo = Math.max(lo, Math.min(0, v));
+  const pos = x => Math.max(0, Math.min(100, (x - lo) / (hi - lo) * 100));
+  const a = mn != null ? pos(mn) : 0, b = mx != null ? pos(mx) : 100;
+  const cor = r.critico ? "var(--crit)" : FORA(r.situacao) ? "var(--fora)" : "var(--ok)";
+  const desc = `Seu valor ${fmt(v)}; referência ${mn != null ? `de ${fmt(mn)}` : ""}${mn != null && mx != null ? " " : ""}${mx != null ? `até ${fmt(mx)}` : ""}`;
+  return `<div class="regua" role="img" aria-label="${esc(desc)}"><div class="trilho"></div><div class="ref" style="left:${a}%;width:${b - a}%;border-radius:${a === 0 ? "9px 0 0 9px" : b === 100 ? "0 9px 9px 0" : "0"}"></div>
+    <div class="marc" style="left:${Math.max(3, Math.min(97, pos(v)))}%;background:${cor}"></div>
+    ${mn != null ? `<span class="lim" style="left:${a}%">${fmt(mn)}</span>` : ""}${mx != null ? `<span class="lim" style="left:${b}%">${fmt(mx)}</span>` : ""}</div>`;
+}
 function cartao(item, r) {
   const cls = r?.critico ? "critico" : r && FORA(r.situacao) ? "fora" : "";
-  return `<div class="item ${cls}"><div class="t"><strong>${esc(item.titulo || r?.analito || "")}</strong>${r ? selo(r) : ""}</div>
-    ${r ? `<div class="v"><strong>${esc(r.valor)} ${esc(r.unidade)}</strong>${r.referencia ? `<small> · referência: ${esc(r.referencia)}</small>` : ""}</div>` : ""}
-    ${item.o_que_e ? `<p><strong>O que é:</strong> ${esc(item.o_que_e)}</p>` : ""}
-    ${item.seu_resultado ? `<p><strong>Seu resultado:</strong> ${esc(item.seu_resultado)}</p>` : ""}
-    ${item.possiveis_causas?.length ? `<p><strong>Causas comuns de alteração</strong> (nem sempre são doença):</p>${lista(item.possiveis_causas)}` : ""}</div>`;
+  return `<div class="exame ${cls}">
+    <div class="t"><strong>${esc(item.titulo || r?.nome_padrao || r?.analito || "")}</strong>${r ? selo(r, true) : ""}</div>
+    ${r ? `<div class="valor">${esc(r.valor)} <small>${esc(r.unidade)}</small></div>${regua(r)}${r.referencia && r.ref_min == null && r.ref_max == null ? `<p class="sub pq">Referência: ${esc(r.referencia)}</p>` : ""}` : ""}
+    ${item.seu_resultado ? `<p>${esc(item.seu_resultado)}</p>` : ""}
+    ${item.o_que_e || item.possiveis_causas?.length ? `<details><summary>${item.possiveis_causas?.length ? "O que é e por que pode estar alterado" : "O que este exame mede"}</summary>
+      ${item.o_que_e ? `<p style="margin-top:6px">${esc(item.o_que_e)}</p>` : ""}
+      ${item.possiveis_causas?.length ? `<p style="margin-top:8px"><strong>Causas comuns</strong> (nem sempre são doença):</p>${lista(item.possiveis_causas)}` : ""}</details>` : ""}
+  </div>`;
 }
 function textoResumo(l) {
   const d = l.dados, it = l.interp, linhas = [`Resumo do laudo (${d.laboratorio || "laboratório"}${d.data_coleta ? `, coleta em ${d.data_coleta}` : ""})`, "", it.resumo, "", "Resultados fora da referência:"];
@@ -651,59 +917,85 @@ function textoResumo(l) {
   if (it.perguntas_medico.length) linhas.push("", "Perguntas para o médico:", ...it.perguntas_medico.map(p => `- ${p}`));
   return linhas.join("\n");
 }
+const copiar = (t, m) => navigator.clipboard.writeText(t).then(() => toast(m), () => toast("Não foi possível copiar neste aplicativo."));
 function mostrarLaudo() {
-  const l = atual, d = l.dados, it = l.interp, porI = new Map(it.itens.map(i => [i.indice, i])), alt = [], nor = [];
-  d.resultados.forEach((r, i) => (r.critico || FORA(r.situacao) ? alt : nor).push(cartao(porI.get(i) || { titulo: r.nome_padrao || r.analito }, r)));
+  const l = atual, d = l.dados, it = l.interp, porI = new Map(it.itens.map(i => [i.indice, i]));
+  const res = d.resultados.map((r, i) => ({ r, i, at: r.critico || FORA(r.situacao) }));
+  const nAt = res.filter(x => x.at).length, nCrit = res.filter(x => x.r.critico).length, nOk = res.length - nAt;
+  const vis = res.filter(x => filtroLaudo === "todos" || (filtroLaudo === "atencao" ? x.at : !x.at));
   const desc = it.itens.filter(i => i.indice === -1).map(i => cartao(i, null));
+  const data = d.data_coleta ? `Coleta em ${esc(d.data_coleta)}` : "";
+  $("#passosLaudo").hidden = !recem;
   $("#relatorio").innerHTML = `
-    <div class="linha" style="justify-content:space-between;align-items:flex-start">
-      <div><h2>${esc(d.titulo_exame || "Seu laudo explicado")}</h2><p class="sub">${esc(d.laboratorio)}${d.data_coleta ? ` · coleta em ${esc(d.data_coleta)}` : ""}</p></div>
-      <div class="linha"><button class="mini" id="bEditar">Corrigir transcrição</button><button class="mini" id="bCopiarRes">Copiar resumo</button><button class="mini perigo" id="bExcluir">Excluir laudo</button></div>
+    <div class="cab-laudo">
+      <div><h2>${esc(d.titulo_exame || "Seu laudo explicado")}</h2><p class="sub">${[esc(d.laboratorio), data].filter(Boolean).join(" · ")}</p></div>
+      <div class="lin">
+        <button class="btn peq" id="bCopiarRes">${ic("copia", 'style="width:18px;height:18px"')}Copiar resumo</button>
+        <button class="btn peq" id="bEditar">${ic("lapis", 'style="width:18px;height:18px"')}Corrigir valores</button>
+      </div>
     </div>
-    ${it.procurar_atendimento.length ? `<div class="alerta-crit aviso" style="margin-top:12px"><strong>Procure atendimento médico</strong>${lista(it.procurar_atendimento)}</div>` : ""}
-    <div class="resumo">${esc(it.resumo)}</div>
-    ${desc.length ? `<h3>O que o laudo diz</h3><div class="itens">${desc.join("")}</div>` : ""}
-    ${alt.length ? `<h3>Resultados que merecem atenção (${alt.length})</h3><div class="itens">${alt.join("")}</div>` : ""}
-    ${nor.length ? `<details ${alt.length ? "" : "open"}><summary>Resultados dentro da referência ou sem referência (${nor.length})</summary><div class="itens">${nor.join("")}</div></details>` : ""}
-    ${it.perguntas_medico.length ? `<h3>Perguntas para levar ao seu médico</h3>${lista(it.perguntas_medico)}<button class="mini" id="bCopiarPerg">Copiar perguntas</button>` : ""}
-    ${it.exames_para_conversar.length ? `<h3>Exames para conversar com seu médico</h3><p class="sub pequeno">Sugestões para a conversa, não um pedido de exame. Só o médico decide o que é necessário.</p><ul>${it.exames_para_conversar.map(e => `<li><strong>${esc(e.exame)}</strong>: ${esc(e.motivo)}</li>`).join("")}</ul>` : ""}
-    ${it.habitos.length ? `<h3>Hábitos que costumam ajudar</h3>${lista(it.habitos)}` : ""}
-    ${it.acompanhamento ? `<h3>Acompanhamento</h3><p>${esc(it.acompanhamento)}</p>` : ""}
-    <p class="legal">Esta explicação é educativa e não substitui a avaliação do seu médico. Não use estas informações para iniciar, mudar ou interromper tratamentos. ${it.modo === "claude" ? "Texto gerado com IA (Claude) a partir da transcrição que você conferiu; a classificação de cada valor e os alertas de valores críticos são calculados por regras, pela referência do próprio laudo." : "Explicação básica, gerada sem IA."}</p>`;
+    ${res.length ? `<div class="contadores">
+      <button class="cont ok ${filtroLaudo === "normais" ? "ativo" : ""}" data-f="normais"><b>${nOk}</b><span>dentro da referência</span></button>
+      <button class="cont fora ${filtroLaudo === "atencao" ? "ativo" : ""}" data-f="atencao"><b>${nAt - nCrit}</b><span>fora da referência</span></button>
+      <button class="cont crit" data-f="atencao"><b>${nCrit}</b><span>valores críticos</span></button>
+    </div>` : ""}
+    ${it.procurar_atendimento.length ? `<div class="alerta-crit">${ic("alerta")}<div><strong>Procure atendimento médico</strong>${lista(it.procurar_atendimento)}</div></div>` : ""}
+    <div class="resumo"><div class="ia">${ic(it.modo === "claude" ? "brilho" : "lista", 'style="width:16px;height:16px"')}${it.modo === "claude" ? "Resumo explicado pelo Claude" : "Resumo automático (sem IA)"}</div>${esc(it.resumo)}</div>
+    ${desc.length ? `<h3 style="margin-top:22px">O que o laudo diz</h3><div class="exames">${desc.join("")}</div>` : ""}
+    ${res.length ? `<div class="filtros">
+      <button class="chip ${filtroLaudo === "atencao" ? "ativo" : ""}" data-f="atencao">Merecem atenção (${nAt})</button>
+      <button class="chip ${filtroLaudo === "normais" ? "ativo" : ""}" data-f="normais">Dentro da referência (${nOk})</button>
+      <button class="chip ${filtroLaudo === "todos" ? "ativo" : ""}" data-f="todos">Todos (${res.length})</button>
+    </div>
+    <div class="exames">${vis.map(x => cartao(porI.get(x.i) || { titulo: x.r.nome_padrao || x.r.analito, o_que_e: POR_COD[x.r.codigo]?.descricao || "" }, x.r)).join("") || `<p class="sub">Nenhum resultado neste filtro.</p>`}</div>` : ""}
+    <h3 style="margin-top:28px">Próximos passos</h3>
+    <div class="proximos">
+      ${it.perguntas_medico.length ? `<div class="bloco"><h3>${ic("pergunta")}Perguntas para o médico</h3>
+        <ul class="perg">${it.perguntas_medico.map((p, i) => `<li><label><input type="checkbox"><span>${esc(p)}</span></label></li>`).join("")}</ul>
+        <button class="btn peq" id="bCopiarPerg" style="margin-top:10px">${ic("copia", 'style="width:18px;height:18px"')}Copiar perguntas</button></div>` : ""}
+      ${it.exames_para_conversar.length ? `<div class="bloco"><h3>${ic("doc")}Exames para conversar</h3><p class="sub pq">Sugestões para a consulta, não um pedido de exame.</p>
+        <ul>${it.exames_para_conversar.map(e => `<li><strong>${esc(e.exame)}</strong>: ${esc(e.motivo)}</li>`).join("")}</ul></div>` : ""}
+      ${it.habitos.length ? `<div class="bloco"><h3>${ic("folha")}Hábitos que ajudam</h3>${lista(it.habitos)}</div>` : ""}
+      ${it.acompanhamento ? `<div class="bloco"><h3>${ic("cal")}Acompanhamento</h3><p>${esc(it.acompanhamento)}</p></div>` : ""}
+    </div>
+    <p class="legal">Esta explicação é educativa e não substitui a avaliação do seu médico. Não use estas informações para iniciar, mudar ou interromper tratamentos. ${it.modo === "claude" ? "O texto foi gerado com IA a partir dos valores que você conferiu; a classificação de cada valor e os alertas de valores críticos são calculados por regras, pela referência do próprio laudo." : ""}</p>
+    <div class="lin" style="margin-top:14px"><button class="btn peq perigo" id="bExcluir">${ic("lixo", 'style="width:18px;height:18px"')}Excluir este laudo</button></div>`;
+  $$("#relatorio [data-f]").forEach(b => b.addEventListener("click", () => { filtroLaudo = b.dataset.f; mostrarLaudo(); }));
   $("#bEditar").addEventListener("click", mostrarConferencia);
-  const copiar = (t, m) => navigator.clipboard.writeText(t).then(() => toast(m), () => toast("Não foi possível copiar neste aplicativo."));
   $("#bCopiarRes").addEventListener("click", () => copiar(textoResumo(l), "Resumo copiado. Cole numa mensagem ou nota para levar à consulta."));
   $("#bCopiarPerg")?.addEventListener("click", () => copiar(it.perguntas_medico.map(p => `- ${p}`).join("\n"), "Perguntas copiadas."));
-  confirmar($("#bExcluir"), "Confirmar exclusão", () => { LAUDOS = LAUDOS.filter(x => x.id !== l.id); salvar(); toast("Laudo excluído."); mostrar("laudos"); });
-  mostrar("laudo");
+  confirmar($("#bExcluir"), "Toque de novo para excluir", () => { LAUDOS = LAUDOS.filter(x => x.id !== l.id); salvar(); toast("Laudo excluído."); mostrar("laudos"); });
+  const rolar = window.scrollY; mostrar("laudo"); if (rolar && $("#relatorio").dataset.id == l.id) window.scrollTo(0, rolar);
+  $("#relatorio").dataset.id = l.id;
 }
 function confirmar(btn, rotulo, acao) {
-  const orig = btn.textContent;
+  const orig = btn.innerHTML;
   btn.addEventListener("click", () => {
     if (btn.dataset.armado) return acao();
     btn.dataset.armado = 1; btn.textContent = rotulo;
-    setTimeout(() => { delete btn.dataset.armado; btn.textContent = orig; }, 4000);
+    setTimeout(() => { delete btn.dataset.armado; btn.innerHTML = orig; }, 4000);
   });
 }
 
-/* ---------------- lista ---------------- */
+/* ---------------- meus laudos ---------------- */
+const MES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 function desenharLista() {
   const el = $("#lista");
-  if (!LAUDOS.length) { el.innerHTML = `<div class="vazio">Nenhum laudo ainda. Envie o PDF ou uma foto do seu primeiro laudo.</div>`; return; }
+  if (!LAUDOS.length) { el.innerHTML = `<div class="vazio"><div class="bola">${ic("doc")}</div><strong style="color:var(--ink);font-size:18px">Nenhum laudo ainda</strong><p>Envie o PDF ou uma foto do seu primeiro laudo para começar.</p><button class="btn pri" id="bPrimeiro">${ic("up")}Enviar laudo</button></div>`; $("#bPrimeiro").addEventListener("click", () => mostrar("enviar")); return; }
   el.innerHTML = LAUDOS.map(l => {
     const d = l.dados, n = d.resultados.length, f = d.resultados.filter(r => FORA(r.situacao)).length, c = d.resultados.filter(r => r.critico).length;
-    const s = c ? `<span class="selo critico">! ${c} valor(es) crítico(s)</span>` : f ? `<span class="selo alto">${f} fora da referência</span>` : n ? `<span class="selo normal">✓ Todos dentro da referência</span>` : "";
-    return `<div class="laudo-item" data-id="${l.id}" role="button" tabindex="0"><div><strong>${esc(d.data_coleta || l.criado.slice(0, 10))} · ${esc(d.laboratorio || l.arquivo)}</strong>
-      <div class="sub pequeno">${d.tipo !== "laboratorial" ? esc(d.titulo_exame || "Laudo descritivo") : `${n} resultados`} · ${l.status === "interpretado" ? "Explicado" : "Aguardando conferência"}</div></div><div>${s}</div></div>`;
+    const iso = dataISO(d.data_coleta) || l.criado.slice(0, 10);
+    const s = c ? `<span class="selo critico">! ${c} crítico${c > 1 ? "s" : ""}</span>` : f ? `<span class="selo alto">${f} fora da ref.</span>` : n ? `<span class="selo normal">✓ Tudo dentro</span>` : "";
+    return `<button class="laudo-card" data-id="${l.id}"><span class="data-bloco"><span><b>${iso.slice(8, 10)}</b><br><small>${MES[+iso.slice(5, 7) - 1] || ""} ${iso.slice(2, 4)}</small></span></span>
+      <span class="meio"><strong>${esc(d.titulo_exame || d.laboratorio || l.arquivo)}</strong><span class="sub pq">${d.tipo !== "laboratorial" ? "Laudo descritivo" : `${n} resultado${n === 1 ? "" : "s"}`} · ${l.status === "interpretado" ? "explicado" : "falta conferir"}</span><br>${s}</span>${ic("seta")}</button>`;
   }).join("");
-  $$(".laudo-item", el).forEach(i => { const abrir = () => { atual = LAUDOS.find(l => l.id === +i.dataset.id); atual.interp ? mostrarLaudo() : mostrarConferencia(); }; i.addEventListener("click", abrir); i.addEventListener("keydown", e => e.key === "Enter" && abrir()); });
+  $$(".laudo-card", el).forEach(b => b.addEventListener("click", () => { atual = LAUDOS.find(l => l.id === +b.dataset.id); filtroLaudo = atual.dados.resultados.some(r => FORA(r.situacao) || r.critico) ? "atencao" : "todos"; recem = false; atual.interp ? mostrarLaudo() : mostrarConferencia(); }));
 }
-confirmar($("#bApagar"), "Confirmar: apagar tudo", () => { LAUDOS = []; store.del("laudos"); store.del("perfil"); previas = {}; toast("Dados apagados."); mostrar("inicio"); });
+confirmar($("#bApagar"), "Toque de novo para apagar tudo", () => { LAUDOS = []; store.del("laudos"); store.del("perfil"); previas = {}; toast("Dados apagados."); mostrar("inicio"); });
 
 /* ---------------- evolução ---------------- */
-const fmt = v => v == null ? "" : Number(v).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
 const dBR = iso => iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : "sem data";
-let GRUPOS = [];
+let GRUPOS = [], filtroEv = "todos";
 function grupos() {
   const g = {};
   for (const l of LAUDOS) {
@@ -712,23 +1004,30 @@ function grupos() {
     for (const r of l.dados.resultados) if (r.codigo) (g[r.codigo] ||= { codigo: r.codigo, nome: POR_COD[r.codigo]?.nome || r.analito, categoria: POR_COD[r.codigo]?.categoria || "", pontos: [] }).pontos.push({ data, ...r });
   }
   return Object.values(g).map(x => { x.pontos.sort((a, b) => a.data.localeCompare(b.data)); x.ultimo = x.pontos[x.pontos.length - 1]; return x; })
-    .sort((a, b) => (a.categoria + a.nome).localeCompare(b.categoria + b.nome, "pt-BR"));
+    .sort((a, b) => (+b.pontos.some(p => FORA(p.situacao)) - +a.pontos.some(p => FORA(p.situacao))) || a.nome.localeCompare(b.nome, "pt-BR"));
 }
 function desenharEvolucao() {
-  const todos = grupos(), fil = $("#filtroEv").value;
-  GRUPOS = todos.filter(g => fil === "todos" || g.pontos.some(p => FORA(p.situacao)));
+  const todos = grupos(), q = normalizar($("#buscaEv").value);
+  GRUPOS = todos.filter(g => (filtroEv === "todos" || g.pontos.some(p => FORA(p.situacao))) && (!q || normalizar(g.nome + " " + g.categoria).includes(q)));
   const el = $("#graficos");
-  if (!GRUPOS.length) { el.innerHTML = `<div class="vazio">${todos.length ? "Nenhum exame fora da referência." : "Os gráficos aparecem depois que você explicar pelo menos um laudo."}</div>`; return; }
-  el.innerHTML = GRUPOS.map((g, i) => `<div class="graf"><h4>${esc(g.nome)}</h4>
-    <div class="s">${esc(g.categoria)} · último: <strong>${esc(g.ultimo.valor)} ${esc(g.ultimo.unidade)}</strong> ${selo(g.ultimo)}</div>
-    <div class="fig"><svg data-g="${i}" role="img" aria-label="Evolução de ${esc(g.nome)}"></svg></div>
-    <details><summary>Ver valores (${g.pontos.length})</summary><div class="scroll"><table><thead><tr><th>Coleta</th><th>Resultado</th><th>Referência</th></tr></thead><tbody>
-    ${g.pontos.map(p => `<tr><td>${dBR(p.data)}</td><td>${esc(p.valor)} ${esc(p.unidade)}</td><td>${esc(p.referencia)}</td></tr>`).join("")}</tbody></table></div></details>
-    ${POR_COD[g.codigo]?.descricao ? `<p class="sub pequeno">${esc(POR_COD[g.codigo].descricao)}</p>` : ""}</div>`).join("");
+  if (!GRUPOS.length) {
+    el.innerHTML = `<div class="vazio" style="grid-column:1/-1"><div class="bola">${ic("graf")}</div><p>${todos.length ? "Nenhum exame encontrado com esse filtro." : "Os gráficos aparecem depois que você explicar pelo menos um laudo."}</p></div>`;
+    return;
+  }
+  el.innerHTML = GRUPOS.map((g, i) => {
+    const u = g.ultimo, ant = g.pontos.length > 1 ? g.pontos[g.pontos.length - 2] : null;
+    const delta = ant && u.valor_numerico != null && ant.valor_numerico != null && unidade(ant.unidade) === unidade(u.unidade) ? u.valor_numerico - ant.valor_numerico : null;
+    return `<div class="graf"><div class="t"><div><strong>${esc(g.nome)}</strong><div class="sub pq">${esc(g.categoria)}</div></div>${selo(u, true)}</div>
+      <div class="ult">${esc(u.valor)} <small>${esc(u.unidade)}${delta != null && delta !== 0 ? ` · ${delta > 0 ? "▲" : "▼"} ${fmt(Math.abs(delta))} desde ${dBR(ant.data)}` : ""}</small></div>
+      <div class="fig"><svg data-g="${i}" role="img" aria-label="Evolução de ${esc(g.nome)}"></svg></div>
+      <details><summary>Ver todos os valores (${g.pontos.length})</summary><table><thead><tr><th>Coleta</th><th>Resultado</th><th>Referência</th></tr></thead><tbody>
+      ${g.pontos.map(p => `<tr><td>${dBR(p.data)}</td><td>${esc(p.valor)} ${esc(p.unidade)}</td><td>${esc(p.referencia)}</td></tr>`).join("")}</tbody></table></details></div>`;
+  }).join("");
   $$("#graficos svg").forEach(s => { desenharGrafico(s); ro.observe(s); });
 }
 const ro = new ResizeObserver(es => es.forEach(e => desenharGrafico(e.target)));
-$("#filtroEv").addEventListener("change", desenharEvolucao);
+$("#buscaEv").addEventListener("input", desenharEvolucao);
+$$("#filtroEv .chip").forEach(b => b.addEventListener("click", () => { filtroEv = b.dataset.f; $$("#filtroEv .chip").forEach(x => x.classList.toggle("ativo", x === b)); desenharEvolucao(); }));
 function desenharGrafico(s) {
   const g = GRUPOS[+s.dataset.g]; if (!g) return;
   const W = s.clientWidth, H = s.clientHeight; if (!W) return;
@@ -744,13 +1043,13 @@ function desenharGrafico(s) {
   const y = v => m.t + (H - m.t - m.b) * (1 - (v - lo) / (hi - lo));
   const ticks = []; for (let t = lo; t <= hi + passo / 2; t += passo) ticks.push(t);
   const rTop = u.ref_max != null ? y(u.ref_max) : m.t, rBase = u.ref_min != null ? y(u.ref_min) : H - m.b;
-  const pequenoW = W < 260;
-  s.innerHTML = `${ticks.map(t => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="currentColor" stroke-opacity=".12"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${fmt(t)}</text>`).join("")}
-    ${u.ref_min != null || u.ref_max != null ? `<rect x="${m.l}" width="${W - m.l - m.r}" y="${Math.min(rTop, rBase)}" height="${Math.abs(rBase - rTop)}" style="fill:var(--faixa)"/>` : ""}
-    <line class="mira" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" stroke="currentColor" stroke-opacity=".4" visibility="hidden"/>
-    ${pts.length > 1 ? `<path d="${pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.valor_numerico).toFixed(1)}`).join(" ")}" fill="none" style="stroke:var(--serie)" stroke-width="2" stroke-linejoin="round"/>` : ""}
-    ${pts.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.valor_numerico)}" r="${FORA(p.situacao) ? 5 : 4}" style="fill:${FORA(p.situacao) ? "var(--crit)" : "var(--serie)"};stroke:var(--papel)" stroke-width="2"/>`).join("")}
-    ${pts.map((p, i) => (i === 0 || i === pts.length - 1 || (!pequenoW && pts.length <= 4)) ? `<text x="${x(i)}" y="${H - 5}" text-anchor="${pts.length === 1 ? "middle" : i === 0 ? "start" : i === pts.length - 1 ? "end" : "middle"}">${dBR(p.data)}</text>` : "").join("")}
+  const estreito = W < 260;
+  s.innerHTML = `${ticks.map(t => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="currentColor" stroke-opacity=".1"/><text x="${m.l - 8}" y="${y(t) + 4}" text-anchor="end">${fmt(t)}</text>`).join("")}
+    ${u.ref_min != null || u.ref_max != null ? `<rect x="${m.l}" width="${W - m.l - m.r}" y="${Math.min(rTop, rBase)}" height="${Math.abs(rBase - rTop)}" rx="4" style="fill:var(--faixa)"/>` : ""}
+    <line class="mira" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" stroke="currentColor" stroke-opacity=".35" visibility="hidden"/>
+    ${pts.length > 1 ? `<path d="${pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.valor_numerico).toFixed(1)}`).join(" ")}" fill="none" style="stroke:var(--marca)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ""}
+    ${pts.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.valor_numerico)}" r="${FORA(p.situacao) ? 6 : 5}" style="fill:${p.critico ? "var(--crit)" : FORA(p.situacao) ? "var(--fora)" : "var(--marca)"};stroke:var(--card)" stroke-width="2.5"/>`).join("")}
+    ${pts.map((p, i) => (i === 0 || i === pts.length - 1 || (!estreito && pts.length <= 4)) ? `<text x="${x(i)}" y="${H - 5}" text-anchor="${pts.length === 1 ? "middle" : i === 0 ? "start" : i === pts.length - 1 ? "end" : "middle"}">${dBR(p.data)}</text>` : "").join("")}
     <rect class="alvo" x="${m.l}" y="0" width="${Math.max(0, W - m.l - m.r)}" height="${H}" fill="transparent"/>`;
   const cs = $$("circle", s), mira = $(".mira", s), tip = $("#tip"), alvo = $(".alvo", s);
   alvo.addEventListener("pointermove", e => {
@@ -759,7 +1058,7 @@ function desenharGrafico(s) {
     const p = pts[k], cx = +cs[k].getAttribute("cx"), cy = +cs[k].getAttribute("cy");
     mira.setAttribute("x1", cx); mira.setAttribute("x2", cx); mira.setAttribute("visibility", "visible");
     tip.innerHTML = `<strong>${esc(p.valor)} ${esc(p.unidade)}</strong><br>${dBR(p.data)}<br>${SELO[p.situacao] || ""}`; tip.hidden = false;
-    tip.style.left = Math.min(bx.left + cx + 12, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = Math.max(4, bx.top + cy - tip.offsetHeight - 8) + "px";
+    tip.style.left = Math.min(bx.left + cx + 12, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = Math.max(4, bx.top + cy - tip.offsetHeight - 10) + "px";
   });
   alvo.addEventListener("pointerleave", () => { tip.hidden = true; mira.setAttribute("visibility", "hidden"); });
 }
